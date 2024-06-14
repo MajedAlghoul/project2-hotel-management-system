@@ -19,8 +19,8 @@ public class DuplicateResourceException extends RuntimeException {
     private Date timestamp;
     private String resourceName;
     private String fieldName;
-    private int fieldValue;
-    public DuplicateResourceException(String resourceName, String fieldName, int fieldValue) {
+    private String fieldValue;
+    public DuplicateResourceException(String resourceName, String fieldName, String fieldValue) {
         super(String.format("Resource '%s' with field:value '%s':'%d' already exists.", resourceName, fieldName, fieldValue));
         this.timestamp = new Timestamp(new Date().getTime());
         this.resourceName = resourceName;

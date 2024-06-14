@@ -1,6 +1,9 @@
 package com.hms.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,9 +20,9 @@ import lombok.NoArgsConstructor;
 @Data // Generates Getters, Setters, toString, hashCode, & equals methods for non-transient fields
 @Entity // Specifies to the JPA that this class is an entity to be mapped to a database table
 @Table // Specifies to the JPA the table details to persist the entity in the database
-public class Employee {
+public class Customer {
     @Id // Primary key
-    private String employee_email;
+    private String customer_email;
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)

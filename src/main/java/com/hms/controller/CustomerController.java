@@ -14,7 +14,7 @@ import java.util.HashMap;
 /**
  * Contains endpoints related to the Customer resource.
  */
-
+@RequestMapping("/api/customer")
 @RestController
 public class CustomerController {
     private final CustomerService customerService;
@@ -24,12 +24,12 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
-    @PostMapping(value = "/customer", produces = "application/json")
+    @PostMapping(produces = "application/json")
     public ResponseEntity<CustomerDto> postCustomer(@Validated @RequestBody CustomerDto customer) {
         return ResponseEntity.ok().body(customerService.postCustomer(customer));
     }
 
-    @GetMapping(value = "/customer", produces = "application/json")
+    @GetMapping(produces = "application/json")
     public ResponseEntity<CustomerDto[]> getCustomers(@Validated @RequestParam String pageNumber, @RequestParam String pageSize) {
         int pageNumberInt, pageSizeInt;
         try{
@@ -43,36 +43,24 @@ public class CustomerController {
         return ResponseEntity.ok().body(customerService.getCustomers(pageNumberInt, pageSizeInt));
     }
 
-    @PutMapping(value = "/customer", produces = "application/json")
+    @PutMapping(produces = "application/json")
     public ResponseEntity<CustomerDto> putCustomer(@Validated @RequestBody CustomerDto customer) {
         return ResponseEntity.ok().body(customerService.replaceCustomer(customer));
     }
 
-    @PatchMapping(value = "/customer", produces = "application/json")
+    @PatchMapping(produces = "application/json")
     public ResponseEntity<CustomerDto> patchCustomer(@Validated @RequestBody CustomerDto customer) {
         return ResponseEntity.ok().body(customerService.modifyCustomer(customer));
     }
 
-    @DeleteMapping(value = "/customer/{customer_id}", produces = "application/json")
+    @DeleteMapping(value = "/{customer_id}", produces = "application/json")
     public ResponseEntity<HashMap<String, String>> deleteCustomer(@Validated @PathVariable String customer_id) {
-        int id;
-        try{
-            id = Integer.parseInt(customer_id);
-        } catch(NumberFormatException e){
-            throw new IllegalInputException("Customer", "customer_id", customer_id);
-        }
-        customerService.deleteCustomer(id);
+        customerService.deleteCustomer(customer_id);
         return ResponseEntity.ok().body(new StandardMessageBody("Deleted successfully.").getContent());
     }
 
-    @GetMapping(value = "/customer/{customer_id}", produces = "application/json")
+    @GetMapping(value = "/{customer_id}", produces = "application/json")
     public ResponseEntity<CustomerDto> getCustomer(@Validated @PathVariable String customer_id) {
-        int id;
-        try{
-            id = Integer.parseInt(customer_id);
-        } catch(NumberFormatException e){
-            throw new IllegalInputException("Customer", "customer_id", customer_id);
-        }
-        return ResponseEntity.ok().body(customerService.getCustomerById(id));
+        return ResponseEntity.ok().body(customerService.getCustomerById(customer_id));
     }
 }

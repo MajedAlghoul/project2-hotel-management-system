@@ -52,14 +52,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void deleteEmployee(Integer employee_id) {
+    public void deleteEmployee(String employee_id) {
         if(!employeeRepository.existsById(employee_id))
             throw new ResourceNotFoundException("Employee", "employee_id", String.valueOf(employee_id));
         employeeRepository.deleteById(employee_id);
     }
 
     @Override
-    public EmployeeDto getEmployeeById(Integer employee_id) {
+    public EmployeeDto getEmployeeById(String employee_id) {
         return mapToDto(employeeRepository.findById(employee_id).orElseThrow(() -> new ResourceNotFoundException("Employee", "employee_id", String.valueOf(employee_id))));
     }
 

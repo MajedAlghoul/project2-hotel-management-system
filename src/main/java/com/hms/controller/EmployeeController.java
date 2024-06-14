@@ -14,7 +14,7 @@ import java.util.HashMap;
 /**
  * Contains endpoints related to the Employee resource.
  */
-
+@RequestMapping("/api/employee")
 @RestController
 public class EmployeeController {
     private final EmployeeService employeeService;
@@ -24,12 +24,12 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    @PostMapping(value = "/employee", produces = "application/json")
+    @PostMapping(produces = "application/json")
     public ResponseEntity<EmployeeDto> postEmployee(@Validated @RequestBody EmployeeDto employee) {
         return ResponseEntity.ok().body(employeeService.postEmployee(employee));
     }
 
-    @GetMapping(value = "/employee", produces = "application/json")
+    @GetMapping(produces = "application/json")
     public ResponseEntity<EmployeeDto[]> getEmployees(@Validated @RequestParam String pageNumber, @RequestParam String pageSize) {
         int pageNumberInt, pageSizeInt;
         try{
@@ -43,36 +43,36 @@ public class EmployeeController {
         return ResponseEntity.ok().body(employeeService.getEmployees(pageNumberInt, pageSizeInt));
     }
 
-    @PutMapping(value = "/employee", produces = "application/json")
+    @PutMapping(produces = "application/json")
     public ResponseEntity<EmployeeDto> putEmployee(@Validated @RequestBody EmployeeDto employee) {
         return ResponseEntity.ok().body(employeeService.replaceEmployee(employee));
     }
 
-    @PatchMapping(value = "/employee", produces = "application/json")
+    @PatchMapping(produces = "application/json")
     public ResponseEntity<EmployeeDto> patchEmployee(@Validated @RequestBody EmployeeDto employee) {
         return ResponseEntity.ok().body(employeeService.modifyEmployee(employee));
     }
 
-    @DeleteMapping(value = "/employee/{employee_id}", produces = "application/json")
+    @DeleteMapping(value = "/{employee_id}", produces = "application/json")
     public ResponseEntity<HashMap<String, String>> deleteEmployee(@Validated @PathVariable String employee_id) {
-        int id;
-        try{
-            id = Integer.parseInt(employee_id);
-        } catch(NumberFormatException e){
-            throw new IllegalInputException("Employee", "employee_id", employee_id);
-        }
-        employeeService.deleteEmployee(id);
+        //String id;
+        //try{
+        //    id = Integer.parseInt(employee_id);
+        //} catch(NumberFormatException e){
+        //    throw new IllegalInputException("Employee", "employee_id", employee_id);
+        //}
+        employeeService.deleteEmployee(employee_id);
         return ResponseEntity.ok().body(new StandardMessageBody("Deleted successfully.").getContent());
     }
 
-    @GetMapping(value = "/employee/{employee_id}", produces = "application/json")
+    @GetMapping(value = "/{employee_id}", produces = "application/json")
     public ResponseEntity<EmployeeDto> getEmployee(@Validated @PathVariable String employee_id) {
-        int id;
-        try{
-            id = Integer.parseInt(employee_id);
-        } catch(NumberFormatException e){
-            throw new IllegalInputException("Employee", "employee_id", employee_id);
-        }
-        return ResponseEntity.ok().body(employeeService.getEmployeeById(id));
+        //int id;
+        //try{
+        //    id = Integer.parseInt(employee_id);
+        //} catch(NumberFormatException e){
+        //    throw new IllegalInputException("Employee", "employee_id", employee_id);
+        //}
+        return ResponseEntity.ok().body(employeeService.getEmployeeById(employee_id));
     }
 }
