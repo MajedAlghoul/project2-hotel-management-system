@@ -1,4 +1,4 @@
-package com.hms.Config;
+package com.hms.config;
 
 import com.hms.Security.CustomUserDetailsService;
 import com.hms.Security.JwtAuthenticationEntryPoint;
