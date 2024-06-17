@@ -1,13 +1,16 @@
-package com.inventorymanagementsystem.model;
+package com.hms.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
-    <p>This class represents an Inventory entity</p>
+    <p>This class represents an Task entity</p>
     <p>An entity represents a database table to JPA</p>
  */
 
@@ -17,14 +20,13 @@ import lombok.NoArgsConstructor;
 @Data // Generates Getters, Setters, toString, hashCode, & equals methods for non-transient fields
 @Entity // Specifies to the JPA that this class is an entity to be mapped to a database table
 @Table // Specifies to the JPA the table details to persist the entity in the database
-public class Inventory {
+public class Task {
     @Id // Primary key
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-incremented by the persistence provider
-    private int inventory_id;
+    private String id;
     @Column(nullable = false)
-    private int equipment_id;
+    private String name;
     @Column(nullable = false)
-    private int branch_id;
+    private String description;
     @Column(nullable = false)
-    private String serial_number;
+    private String assigned_to;
 }

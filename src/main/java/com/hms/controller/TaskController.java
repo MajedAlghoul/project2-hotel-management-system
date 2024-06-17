@@ -1,4 +1,78 @@
 package com.hms.controller;
 
+import com.hms.dto.TaskDto;
+import com.hms.exception.IllegalInputException;
+import com.hms.responsebody.StandardMessageBody;
+import com.hms.service.TaskService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+
+/**
+ * Contains endpoints related to the Task resource.
+ */
+@RequestMapping("/api/task")
+@RestController
 public class TaskController {
+    private final TaskService taskService;
+
+    @Autowired
+    public TaskController(TaskService taskService) {
+        this.taskService = taskService;
+    }
+
+    @PostMapping(produces = "application/json")
+    public ResponseEntity<TaskDto> postTask(@Validated @RequestBody TaskDto task) {
+        return ResponseEntity.ok().body(taskService.postTask(task));
+    }
+
+    @GetMapping(produces = "application/json")
+    public ResponseEntity<TaskDto[]> getTasks(@Validated @RequestParam String pageNumber, @RequestParam String pageSize) {
+        int pageNumberInt, pageSizeInt;
+        try{
+            pageNumberInt = Integer.parseInt(pageNumber);
+            pageSizeInt = Integer.parseInt(pageSize);
+            if(pageNumberInt < 0 || pageNumberInt > pageSizeInt || pageSizeInt < 1)
+                throw new IllegalInputException("Task", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
+        } catch(NumberFormatException e){
+            throw new IllegalInputException("Task", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
+        }
+        return ResponseEntity.ok().body(taskService.getTasks(pageNumberInt, pageSizeInt));
+    }
+
+    @PutMapping(produces = "application/json")
+    public ResponseEntity<TaskDto> putTask(@Validated @RequestBody TaskDto task) {
+        return ResponseEntity.ok().body(taskService.replaceTask(task));
+    }
+
+    @PatchMapping(produces = "application/json")
+    public ResponseEntity<TaskDto> patchTask(@Validated @RequestBody TaskDto task) {
+        return ResponseEntity.ok().body(taskService.modifyTask(task));
+    }
+
+    @DeleteMapping(value = "/{task_id}", produces = "application/json")
+    public ResponseEntity<HashMap<String, String>> deleteTask(@Validated @PathVariable String task_id) {
+        //String id;
+        //try{
+        //    id = Integer.parseInt(task_id);
+        //} catch(NumberFormatException e){
+        //    throw new IllegalInputException("Task", "task_id", task_id);
+        //}
+        taskService.deleteTask(task_id);
+        return ResponseEntity.ok().body(new StandardMessageBody("Deleted successfully.").getContent());
+    }
+
+    @GetMapping(value = "/{task_id}", produces = "application/json")
+    public ResponseEntity<TaskDto> getTask(@Validated @PathVariable String task_id) {
+        //int id;
+        //try{
+        //    id = Integer.parseInt(task_id);
+        //} catch(NumberFormatException e){
+        //    throw new IllegalInputException("Task", "task_id", task_id);
+        //}
+        return ResponseEntity.ok().body(taskService.getTaskById(task_id));
+    }
 }
