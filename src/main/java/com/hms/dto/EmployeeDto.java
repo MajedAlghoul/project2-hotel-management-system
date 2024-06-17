@@ -6,7 +6,7 @@ import lombok.Data;
 @Data // Generates Getters, Setters, toString, hashCode, & equals methods for non-transient fields
 @Builder // Generates a static Builder-Design-Pattern builder method
 public class EmployeeDto {
-    private String employee_email;
+    private String employeeEmail;
     private String name;
-    private String password_hash;
+    private String passwordHash;
 }

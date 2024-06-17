@@ -128,7 +128,7 @@ public class EmployeeController {
             }
     )
     @DeleteMapping(value = "/{employee_id}", produces = "application/json")
-    public ResponseEntity<HashMap<String, String>> deleteEmployee(@Validated @PathVariable String employee_id) {
+    public ResponseEntity<HashMap<String, String>> deleteEmployee(@Validated @PathVariable Long employee_id) {
         //String id;
         //try{
         //    id = Integer.parseInt(employee_id);
@@ -154,7 +154,7 @@ public class EmployeeController {
             }
     )
     @GetMapping(value = "/{employee_id}", produces = "application/json")
-    public ResponseEntity<EmployeeDto> getEmployee(@Validated @PathVariable String employee_id) {
+    public ResponseEntity<EmployeeDto> getEmployee(@Validated @PathVariable Long employee_id) {
         //int id;
         //try{
         //    id = Integer.parseInt(employee_id);
