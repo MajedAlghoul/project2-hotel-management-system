@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 /**
     <p>This class represents an Employee entity</p>
     <p>An entity represents a database table to JPA</p>
@@ -16,11 +18,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor // Generates a constructor with no formal parameters
 @Data // Generates Getters, Setters, toString, hashCode, & equals methods for non-transient fields
 @Entity // Specifies to the JPA that this class is an entity to be mapped to a database table
-@Table // Specifies to the JPA the table details to persist the entity in the database
+@Table(name = "employee", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"employee_email"})
+}) // Specifies to the JPA the table details to persist the entity in the database
 public class Employee {
-    @Id // Primary key
-    private String employee_email;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+    @Column(nullable = false)
+    private String employeeEmail;
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)
-    private String password_hash;}
+    private String passwordHash;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    private Set<Role> role;
+}

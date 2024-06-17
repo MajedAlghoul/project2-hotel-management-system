@@ -1,8 +1,11 @@
 package com.hms.repository;
 
+import com.hms.model.Customer;
 import com.hms.model.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 /**
  <p>JpaRepository extends CrudRepository and PagingAndSortingRepository.</p>
@@ -21,5 +24,7 @@ import org.springframework.stereotype.Repository;
  <li>JpaRepository itself provides some JPA-related methods such as flushing the persistence context and deleting records in a batch.</li>
  */
 @Repository
-public interface EmployeeRepository extends JpaRepository<Employee, String> {
+public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+    Optional<Employee> findByEmployeeEmail(String email);
+    Boolean existsByEmployeeEmail(String email);
 }

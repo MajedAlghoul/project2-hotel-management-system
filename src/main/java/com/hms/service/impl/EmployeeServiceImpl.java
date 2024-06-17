@@ -2,27 +2,37 @@ package com.hms.service.impl;
 
 import com.hms.dto.EmployeeDto;
 import com.hms.exception.DuplicateResourceException;
+import com.hms.model.Customer;
 import com.hms.model.Employee;
+import com.hms.model.Role;
 import com.hms.repository.EmployeeRepository;
 import com.hms.exception.ResourceNotFoundException;
+import com.hms.repository.RoleRepository;
 import com.hms.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+
 @Service // Indicates that this class is a service provider (contains business functionalities)
 public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
-
+    private final RoleRepository roleRepository;
     @Autowired
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository, RoleRepository roleRepository) {
+        this.roleRepository = roleRepository;
         this.employeeRepository = employeeRepository;
     }
 
-    public EmployeeDto postEmployee(EmployeeDto employee) {
-        if(employeeRepository.existsById(employee.getEmployee_email()))
-            throw new DuplicateResourceException("Employee", "employee_id", employee.getEmployee_email());
-        return mapToDto(employeeRepository.save(mapToEntity(employee)));
+    public void postEmployee(EmployeeDto employee) {
+        if(employeeRepository.existsByEmployeeEmail(employee.getEmployeeEmail()))
+            throw new DuplicateResourceException("Employee", "employee_id", employee.getEmployeeEmail());
+        Employee newEmployee = mapToEntity(employee);
+        Role role = roleRepository.findByName("ROLE_EMPLOYEE").get();
+        newEmployee.setRole(Collections.singleton(role));
+        employeeRepository.save(newEmployee);
+        //return mapToDto(customerRepository.save(newCustomer));
     }
 
     @Override
@@ -39,43 +49,43 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeDto replaceEmployee(EmployeeDto employee) {
-        if(!employeeRepository.existsById(employee.getEmployee_email()))
-            throw new ResourceNotFoundException("Employee", "employee_id", String.valueOf(employee.getEmployee_email()));
+        if(!employeeRepository.existsByEmployeeEmail(employee.getEmployeeEmail()))
+            throw new ResourceNotFoundException("Employee", "employee_id", String.valueOf(employee.getEmployeeEmail()));
         return mapToDto(employeeRepository.save(mapToEntity(employee)));
     }
 
     @Override
     public EmployeeDto modifyEmployee(EmployeeDto partialEmployee) {
-        Employee originalEmployee = employeeRepository.findById(partialEmployee.getEmployee_email()).orElseThrow(() -> new ResourceNotFoundException("Employee", "employee_id", String.valueOf(partialEmployee.getEmployee_email())));
+        Employee originalEmployee = employeeRepository.findByEmployeeEmail(partialEmployee.getEmployeeEmail()).orElseThrow(() -> new ResourceNotFoundException("Employee", "employee_id", String.valueOf(partialEmployee.getEmployeeEmail())));
         employeeRepository.save(originalEmployee);
         return mapToDto(originalEmployee);
     }
 
     @Override
-    public void deleteEmployee(String employee_id) {
+    public void deleteEmployee(Long employee_id) {
         if(!employeeRepository.existsById(employee_id))
             throw new ResourceNotFoundException("Employee", "employee_id", String.valueOf(employee_id));
         employeeRepository.deleteById(employee_id);
     }
 
     @Override
-    public EmployeeDto getEmployeeById(String employee_id) {
+    public EmployeeDto getEmployeeById(Long employee_id) {
         return mapToDto(employeeRepository.findById(employee_id).orElseThrow(() -> new ResourceNotFoundException("Employee", "employee_id", String.valueOf(employee_id))));
     }
 
     private EmployeeDto mapToDto(Employee employee) {
         return EmployeeDto.builder()
-                .employee_email(employee.getEmployee_email())
+                .employeeEmail(employee.getEmployeeEmail())
                 .name(employee.getName())
-                .password_hash(employee.getPassword_hash())
+                .passwordHash(employee.getPasswordHash())
                 .build();
     }
 
     private Employee mapToEntity(EmployeeDto employeeDto) {
         return Employee.builder()
-                .employee_email(employeeDto.getEmployee_email())
+                .employeeEmail(employeeDto.getEmployeeEmail())
                 .name(employeeDto.getName())
-                .password_hash(employeeDto.getPassword_hash())
+                .passwordHash(employeeDto.getPasswordHash())
                 .build();
     }
 }

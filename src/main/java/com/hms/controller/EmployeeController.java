@@ -24,11 +24,6 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    @PostMapping(produces = "application/json")
-    public ResponseEntity<EmployeeDto> postEmployee(@Validated @RequestBody EmployeeDto employee) {
-        return ResponseEntity.ok().body(employeeService.postEmployee(employee));
-    }
-
     @GetMapping(produces = "application/json")
     public ResponseEntity<EmployeeDto[]> getEmployees(@Validated @RequestParam String pageNumber, @RequestParam String pageSize) {
         int pageNumberInt, pageSizeInt;
@@ -54,7 +49,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping(value = "/{employee_id}", produces = "application/json")
-    public ResponseEntity<HashMap<String, String>> deleteEmployee(@Validated @PathVariable String employee_id) {
+    public ResponseEntity<HashMap<String, String>> deleteEmployee(@Validated @PathVariable Long employee_id) {
         //String id;
         //try{
         //    id = Integer.parseInt(employee_id);
@@ -66,7 +61,7 @@ public class EmployeeController {
     }
 
     @GetMapping(value = "/{employee_id}", produces = "application/json")
-    public ResponseEntity<EmployeeDto> getEmployee(@Validated @PathVariable String employee_id) {
+    public ResponseEntity<EmployeeDto> getEmployee(@Validated @PathVariable Long employee_id) {
         //int id;
         //try{
         //    id = Integer.parseInt(employee_id);
