@@ -8,6 +8,8 @@ import com.hms.Security.JwtTokenProvider;
 import com.hms.service.CustomerService;
 import com.hms.service.EmployeeService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -51,6 +53,20 @@ public class AuthenticationController {
         return ResponseEntity.ok(new JWTAuthResponse(token));
     }
 
+    @Operation(
+            description = "Endpoint for creating an Employee",
+            summary = "Create Employee",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200"
+                    ),
+                    @ApiResponse(
+                            description = "Unauthorized",
+                            responseCode = "403"
+                    )
+            }
+    )
     @PostMapping("/signup/customer")
     public ResponseEntity<?> registerCustomer (@Validated @RequestBody CustomerDto signUpDto){
 
@@ -60,6 +76,20 @@ public class AuthenticationController {
         return new ResponseEntity<>("Customer registered successfully",
                 HttpStatus.OK);
     }
+    @Operation(
+            description = "Endpoint for creating an Employee",
+            summary = "Create Employee",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200"
+                    ),
+                    @ApiResponse(
+                            description = "Unauthorized",
+                            responseCode = "403"
+                    )
+            }
+    )
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/signup/employee")
     public ResponseEntity<?> registerEmployee (@Validated @RequestBody EmployeeDto signUpDto){

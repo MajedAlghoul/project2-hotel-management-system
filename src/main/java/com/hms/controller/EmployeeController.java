@@ -29,24 +29,11 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    @Operation(
-            description = "Endpoint for creating an Employee",
-            summary = "Create Employee",
-            responses = {
-                    @ApiResponse(
-                            description = "Success",
-                            responseCode = "200"
-                    ),
-                    @ApiResponse(
-                            description = "Unauthorized",
-                            responseCode = "403"
-                    )
-            }
-    )
-    @PostMapping(produces = "application/json")
-    public ResponseEntity<EmployeeDto> postEmployee(@Validated @RequestBody EmployeeDto employee) {
-        return ResponseEntity.ok().body(employeeService.postEmployee(employee));
-    }
+
+    //@PostMapping(produces = "application/json")
+    //public ResponseEntity<EmployeeDto> postEmployee(@Validated @RequestBody EmployeeDto employee) {
+    //    return ResponseEntity.ok().body(employeeService.postEmployee(employee));
+    //}
 
     @Operation(
             description = "Endpoint for fetching a list of Employees",
