@@ -24,11 +24,6 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
-    @PostMapping(produces = "application/json")
-    public ResponseEntity<CustomerDto> postCustomer(@Validated @RequestBody CustomerDto customer) {
-        return ResponseEntity.ok().body(customerService.postCustomer(customer));
-    }
-
     @GetMapping(produces = "application/json")
     public ResponseEntity<CustomerDto[]> getCustomers(@Validated @RequestParam String pageNumber, @RequestParam String pageSize) {
         int pageNumberInt, pageSizeInt;
@@ -54,13 +49,13 @@ public class CustomerController {
     }
 
     @DeleteMapping(value = "/{customer_id}", produces = "application/json")
-    public ResponseEntity<HashMap<String, String>> deleteCustomer(@Validated @PathVariable String customer_id) {
+    public ResponseEntity<HashMap<String, String>> deleteCustomer(@Validated @PathVariable Long customer_id) {
         customerService.deleteCustomer(customer_id);
         return ResponseEntity.ok().body(new StandardMessageBody("Deleted successfully.").getContent());
     }
 
     @GetMapping(value = "/{customer_id}", produces = "application/json")
-    public ResponseEntity<CustomerDto> getCustomer(@Validated @PathVariable String customer_id) {
+    public ResponseEntity<CustomerDto> getCustomer(@Validated @PathVariable Long customer_id) {
         return ResponseEntity.ok().body(customerService.getCustomerById(customer_id));
     }
 }
