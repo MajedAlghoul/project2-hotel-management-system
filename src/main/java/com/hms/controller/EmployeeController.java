@@ -19,6 +19,7 @@ import java.util.HashMap;
  */
 @RequestMapping("/api/employee")
 @RestController
+@Validated
 @Tag(name = "Employee")
 public class EmployeeController {
     private final EmployeeService employeeService;
