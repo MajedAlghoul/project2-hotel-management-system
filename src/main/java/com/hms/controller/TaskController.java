@@ -15,7 +15,7 @@ import java.util.HashMap;
 /**
  * Contains endpoints related to the Task resource.
  */
-@RequestMapping("/api/task")
+@RequestMapping("/api/v2/task")
 @RestController
 @Tag(name = "nada")
 public class TaskController {

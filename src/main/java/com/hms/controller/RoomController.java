@@ -17,7 +17,7 @@ import java.util.HashMap;
 /**
  * Contains endpoints related to the Room resource.
  */
-@RequestMapping("/api/v1/room")
+@RequestMapping("/api/v2/room")
 @RestController
 @Validated
 @Tag(name = "Room")
