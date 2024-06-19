@@ -1,4 +1,4 @@
-# inventory-management-system
+# hotel-management-system
 
 ## Project Overview
 
@@ -56,3 +56,6 @@ The Hotel Management System is designed to streamline operations for both hotel 
 ## OpenAPI specification Design
 
     - [API documentation on swaggerhub](https://app.swaggerhub.com/apis-docs/ahmadmtera/HMS/1.0)
+    - ERD:
+    ![HMS ERD drawio](https://github.com/MajedAlghoul/project2-hotel-management-system/assets/89265941/41a11c81-c045-40e2-b9b0-e257871b6254)
+
