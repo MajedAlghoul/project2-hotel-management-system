@@ -1,0 +1,25 @@
+package com.hms.repository;
+
+import com.hms.model.Room;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+/**
+ <p>JpaRepository extends CrudRepository and PagingAndSortingRepository.</p>
+ <p>CrudRepository generates a concrete class with the following methods implemented:</p>
+ <ul>
+ <li>
+ <ul>
+ <li>createRoom(Room room)</li>
+ <li>getRoom(int room_id)</li>
+ <li>getAllRooms()</li>
+ <li>updateRoom(Room room)</li>
+ <li>deleteRoom(int room_id)</p>
+ </ul>
+ </li>
+ <li>PagingAndSortingRepository provides methods to do pagination and sorting records.</li>
+ <li>JpaRepository itself provides some JPA-related methods such as flushing the persistence context and deleting records in a batch.</li>
+ */
+@Repository
+public interface RoomRepository extends JpaRepository<Room, Long> {
+}

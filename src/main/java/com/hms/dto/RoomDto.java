@@ -15,7 +15,7 @@ public class RoomDto {
     private String details;
     private Long price;
     private String facilities;
-    private String capacity;
+    private Integer capacity;
     private Long size;
     private String features;
     private String type;
