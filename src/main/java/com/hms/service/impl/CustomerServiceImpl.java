@@ -5,11 +5,8 @@ import com.hms.exception.DuplicateResourceException;
 import com.hms.exception.ResourceNotFoundException;
 import com.hms.model.Customer;
 import com.hms.model.Role;
-import com.hms.model.User;
-import com.hms.repository.CustomerRepository;
 import com.hms.repository.CustomerRepository;
 import com.hms.repository.RoleRepository;
-import com.hms.service.CustomerService;
 import com.hms.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -32,8 +29,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     public CustomerDto postCustomer(CustomerDto customer) {
-        if(customerRepository.existsByEmail(customer.getCustomerEmail()))
-            throw new DuplicateResourceException("Customer", "customer_id", customer.getCustomerEmail());
+        if(customerRepository.existsByEmail(customer.getEmail()))
+            throw new DuplicateResourceException("Customer", "customer_id", customer.getEmail());
         Customer newCustomer = mapToEntity(customer);
         Role role = roleRepository.findByName("ROLE_CUSTOMER").get();
         newCustomer.setRole(Collections.singleton(role));
@@ -55,14 +52,14 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDto replaceCustomer(CustomerDto customer) {
-        if(!customerRepository.existsByEmail(customer.getCustomerEmail()))
-            throw new ResourceNotFoundException("Customer", "customer_id", String.valueOf(customer.getCustomerEmail()));
+        if(!customerRepository.existsByEmail(customer.getEmail()))
+            throw new ResourceNotFoundException("Customer", "customer_id", String.valueOf(customer.getEmail()));
         return mapToDto(customerRepository.save(mapToEntity(customer)));
     }
 
     @Override
     public CustomerDto modifyCustomer(CustomerDto partialCustomer) {
-        Customer originalCustomer = customerRepository.findByEmail(partialCustomer.getCustomerEmail()).orElseThrow(() -> new ResourceNotFoundException("Customer", "customer_id", String.valueOf(partialCustomer.getCustomerEmail())));
+        Customer originalCustomer = customerRepository.findByEmail(partialCustomer.getEmail()).orElseThrow(() -> new ResourceNotFoundException("Customer", "customer_id", String.valueOf(partialCustomer.getEmail())));
         customerRepository.save(originalCustomer);
         return mapToDto(originalCustomer);
     }
@@ -81,7 +78,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     private CustomerDto mapToDto(Customer customer) {
         return CustomerDto.builder()
-                .customerEmail(customer.getEmail())
+                .email(customer.getEmail())
                 .name(customer.getName())
                 .passwordHash(customer.getPasswordHash())
                 .build();
@@ -89,7 +86,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     private Customer mapToEntity(CustomerDto customerDto) {
         Customer customer = new Customer();
-        customer.setEmail(customerDto.getCustomerEmail());
+        customer.setEmail(customerDto.getEmail());
         customer.setName(customerDto.getName());
         customer.setPasswordHash(passwordEncoder.encode(customerDto.getPasswordHash()));
         return customer;

@@ -82,11 +82,12 @@ public class AuthenticationController {
                     @ApiResponse(
                             description = "Success",
                             responseCode = "200"
+
                     ),
                     @ApiResponse(
                             description = "Unauthorized",
                             responseCode = "403"
-                    )
+                    ),
             }
     )
     @PreAuthorize("hasRole('ROLE_ADMIN')")

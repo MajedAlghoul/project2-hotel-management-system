@@ -10,7 +10,7 @@ import lombok.Data;
 public class CustomerDto {
     @NotBlank(message = "Email cannot be blank")
     @Email(message = "Email should be valid", regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
-    private String customerEmail;
+    private String email;
     private String name;
     private String passwordHash;
 }
