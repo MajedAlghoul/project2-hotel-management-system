@@ -54,8 +54,8 @@ public class AuthenticationController {
     }
 
     @Operation(
-            description = "Endpoint for creating an Employee",
-            summary = "Create Employee",
+            description = "Endpoint for creating an Customer",
+            summary = "Create Customer",
             responses = {
                     @ApiResponse(
                             description = "Success",

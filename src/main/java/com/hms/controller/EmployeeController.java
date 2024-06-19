@@ -29,12 +29,6 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-
-    //@PostMapping(produces = "application/json")
-    //public ResponseEntity<EmployeeDto> postEmployee(@Validated @RequestBody EmployeeDto employee) {
-    //    return ResponseEntity.ok().body(employeeService.postEmployee(employee));
-    //}
-
     @Operation(
             description = "Endpoint for fetching a list of Employees",
             summary = "Fetch Employees",
@@ -116,14 +110,14 @@ public class EmployeeController {
             }
     )
     @DeleteMapping(value = "/{employee_id}", produces = "application/json")
-    public ResponseEntity<HashMap<String, String>> deleteEmployee(@Validated @PathVariable Long employee_id) {
-        //String id;
-        //try{
-        //    id = Integer.parseInt(employee_id);
-        //} catch(NumberFormatException e){
-        //    throw new IllegalInputException("Employee", "employee_id", employee_id);
-        //}
-        employeeService.deleteEmployee(employee_id);
+    public ResponseEntity<HashMap<String, String>> deleteEmployee(@Validated @PathVariable String employee_id) {
+        long id;
+        try{
+            id = Integer.parseInt(employee_id);
+        } catch(NumberFormatException e){
+            throw new IllegalInputException("Employee", "employee_id", employee_id);
+        }
+        employeeService.deleteEmployee(id);
         return ResponseEntity.ok().body(new StandardMessageBody("Deleted successfully.").getContent());
     }
 
@@ -142,13 +136,13 @@ public class EmployeeController {
             }
     )
     @GetMapping(value = "/{employee_id}", produces = "application/json")
-    public ResponseEntity<EmployeeDto> getEmployee(@Validated @PathVariable Long employee_id) {
-        //int id;
-        //try{
-        //    id = Integer.parseInt(employee_id);
-        //} catch(NumberFormatException e){
-        //    throw new IllegalInputException("Employee", "employee_id", employee_id);
-        //}
-        return ResponseEntity.ok().body(employeeService.getEmployeeById(employee_id));
+    public ResponseEntity<EmployeeDto> getEmployee(@Validated @PathVariable String employee_id) {
+        long id;
+        try{
+            id = Integer.parseInt(employee_id);
+        } catch(NumberFormatException e){
+            throw new IllegalInputException("Employee", "employee_id", employee_id);
+        }
+        return ResponseEntity.ok().body(employeeService.getEmployeeById(id));
     }
 }
