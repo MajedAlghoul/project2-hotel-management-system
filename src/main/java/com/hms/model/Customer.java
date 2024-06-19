@@ -21,5 +21,4 @@ import java.util.Set;
 public class Customer extends User{
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private Set<Reservation> reservation;
-
 }
