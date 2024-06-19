@@ -21,7 +21,7 @@ public class TaskServiceImpl implements TaskService {
 
     public TaskDto postTask(TaskDto task) {
         if(taskRepository.existsById(task.getId()))
-            throw new DuplicateResourceException("Task", "task_id", task.getId());
+            throw new DuplicateResourceException("Task", "task_id", task.getName());
         return mapToDto(taskRepository.save(mapToEntity(task)));
     }
 
@@ -52,14 +52,14 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void deleteTask(String task_id) {
+    public void deleteTask(Long task_id) {
         if(!taskRepository.existsById(task_id))
             throw new ResourceNotFoundException("Task", "task_id", String.valueOf(task_id));
         taskRepository.deleteById(task_id);
     }
 
     @Override
-    public TaskDto getTaskById(String task_id) {
+    public TaskDto getTaskById(Long task_id) {
         return mapToDto(taskRepository.findById(task_id).orElseThrow(() -> new ResourceNotFoundException("Task", "task_id", String.valueOf(task_id))));
     }
 
@@ -68,16 +68,13 @@ public class TaskServiceImpl implements TaskService {
                 .id(task.getId())
                 .name(task.getName())
                 .description(task.getDescription())
-                .assigned_to(task.getAssigned_to())
                 .build();
     }
 
     private Task mapToEntity(TaskDto taskDto) {
         return Task.builder()
-                .id(taskDto.getId())
                 .name(taskDto.getName())
                 .description(taskDto.getDescription())
-                .assigned_to(taskDto.getAssigned_to())
                 .build();
     }
 }

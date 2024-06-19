@@ -17,16 +17,19 @@ import lombok.NoArgsConstructor;
 @Data // Generates Getters, Setters, toString, hashCode, & equals methods for non-transient fields
 @Entity // Specifies to the JPA that this class is an entity to be mapped to a database table
 @Table // Specifies to the JPA the table details to persist the entity in the database
-public class Task {
+public class Bill {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Primary key
     private long id;
     @Column(nullable = false)
-    private String name;
+    private long invoiceTotal;
     @Column(nullable = false)
-    private String description;
+    private long paid;
+    @Column(nullable = false)
+    private long due;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "employee_id")
-    private Employee assignedTo;
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "reservation_id")
+    private Reservation reservation;
 }

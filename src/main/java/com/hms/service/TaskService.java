@@ -7,6 +7,6 @@ public interface TaskService {
     TaskDto[] getTasks(Integer pageNumber, Integer pageSize);
     TaskDto replaceTask(TaskDto task);
     TaskDto modifyTask(TaskDto task);
-    void deleteTask(String task_id);
-    TaskDto getTaskById(String task_id);
+    void deleteTask(Long task_id);
+    TaskDto getTaskById(Long task_id);
 }

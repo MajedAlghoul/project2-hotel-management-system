@@ -1,6 +1,7 @@
 package com.hms.repository;
 
 import com.hms.model.Customer;
+import com.hms.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -23,7 +24,7 @@ import java.util.Optional;
  <li>JpaRepository itself provides some JPA-related methods such as flushing the persistence context and deleting records in a batch.</li>
  */
 @Repository
-public interface CustomerRepository extends JpaRepository<Customer, Long> {
-    Optional<Customer> findByEmail(String email);
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByEmail(String email);
     Boolean existsByEmail(String email);
 }

@@ -21,5 +21,5 @@ import org.springframework.stereotype.Repository;
  <li>JpaRepository itself provides some JPA-related methods such as flushing the persistence context and deleting records in a batch.</li>
  */
 @Repository
-public interface TaskRepository extends JpaRepository<Task, String> {
+public interface TaskRepository extends JpaRepository<Task, Long> {
 }

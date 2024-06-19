@@ -57,24 +57,24 @@ public class TaskController {
 
     @DeleteMapping(value = "/{task_id}", produces = "application/json")
     public ResponseEntity<HashMap<String, String>> deleteTask(@Validated @PathVariable String task_id) {
-        //String id;
-        //try{
-        //    id = Integer.parseInt(task_id);
-        //} catch(NumberFormatException e){
-        //    throw new IllegalInputException("Task", "task_id", task_id);
-        //}
-        taskService.deleteTask(task_id);
+        long id;
+        try{
+            id = Integer.parseInt(task_id);
+        } catch(NumberFormatException e){
+            throw new IllegalInputException("Task", "task_id", task_id);
+        }
+        taskService.deleteTask(id);
         return ResponseEntity.ok().body(new StandardMessageBody("Deleted successfully.").getContent());
     }
 
     @GetMapping(value = "/{task_id}", produces = "application/json")
     public ResponseEntity<TaskDto> getTask(@Validated @PathVariable String task_id) {
-        //int id;
-        //try{
-        //    id = Integer.parseInt(task_id);
-        //} catch(NumberFormatException e){
-        //    throw new IllegalInputException("Task", "task_id", task_id);
-        //}
-        return ResponseEntity.ok().body(taskService.getTaskById(task_id));
+        long id;
+        try{
+            id = Integer.parseInt(task_id);
+        } catch(NumberFormatException e){
+            throw new IllegalInputException("Task", "task_id", task_id);
+        }
+        return ResponseEntity.ok().body(taskService.getTaskById(id));
     }
 }

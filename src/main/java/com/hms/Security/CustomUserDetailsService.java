@@ -3,9 +3,11 @@ package com.hms.Security;
 import com.hms.model.Customer;
 import com.hms.model.Role;
 import com.hms.model.Employee;
+import com.hms.model.User;
 import com.hms.repository.CustomerRepository;
 import com.hms.repository.EmployeeRepository;
 
+import com.hms.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,39 +23,23 @@ import java.util.stream.Collectors;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final CustomerRepository customerRepository;
-    private final EmployeeRepository employeeRepository;
-
-    public CustomUserDetailsService(CustomerRepository customerRepository,EmployeeRepository employeeRepository) {
-        this.employeeRepository = employeeRepository;
-        this.customerRepository = customerRepository;
+    private final UserRepository userRepository;
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository=userRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         // Attempt to find the user as a Customer
-        Optional<Customer> optionalCustomer = customerRepository.findByCustomerEmail(email);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));;
 
-        if (optionalCustomer.isPresent()) {
-            // If found as a Customer, return the UserDetails for the Customer
-            Customer customer = optionalCustomer.get();
-            return new org.springframework.security.core.userdetails.User(
-                    customer.getCustomerEmail(),
-                    customer.getPasswordHash(),
-                    mapRolesToAuthorities(customer.getRole())
-            );
-        } else {
-            // If not found as a Customer, attempt to find the user as an Employee
-            Employee employee = employeeRepository.findByEmployeeEmail(email)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+        // Return the UserDetails for the Employee
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPasswordHash(),
+                mapRolesToAuthorities(user.getRole())
+        );
 
-            // Return the UserDetails for the Employee
-            return new org.springframework.security.core.userdetails.User(
-                    employee.getEmployeeEmail(),
-                    employee.getPasswordHash(),
-                    mapRolesToAuthorities(employee.getRole())
-            );
-        }
     }
 
     private Collection< ? extends GrantedAuthority> mapRolesToAuthorities(Set<Role> roles){

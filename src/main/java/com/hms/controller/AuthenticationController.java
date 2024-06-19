@@ -70,11 +70,10 @@ public class AuthenticationController {
     @PostMapping("/signup/customer")
     public ResponseEntity<?> registerCustomer (@Validated @RequestBody CustomerDto signUpDto){
 
-        customerService.postCustomer(signUpDto);
-        //return ResponseEntity.ok().body(customerService.postCustomer(customer));
+        return ResponseEntity.ok().body(customerService.postCustomer(signUpDto));
 
-        return new ResponseEntity<>("Customer registered successfully",
-                HttpStatus.OK);
+        //return new ResponseEntity<>("Customer registered successfully",
+        //        HttpStatus.OK);
     }
     @Operation(
             description = "Endpoint for creating an Employee",
@@ -94,10 +93,9 @@ public class AuthenticationController {
     @PostMapping("/signup/employee")
     public ResponseEntity<?> registerEmployee (@Validated @RequestBody EmployeeDto signUpDto){
 
-        employeeService.postEmployee(signUpDto);
-        //return ResponseEntity.ok().body(customerService.postCustomer(customer));
+        return ResponseEntity.ok().body(employeeService.postEmployee(signUpDto));
 
-        return new ResponseEntity<>("Employee registered successfully",
-                HttpStatus.OK);
+        //return new ResponseEntity<>("Employee registered successfully",
+        //        HttpStatus.OK);
     }
 }
