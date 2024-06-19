@@ -4,7 +4,6 @@
 
 The Hotel Management System is designed to streamline operations for both hotel employees and guests. This system offers functionalities for customers to search available rooms, make reservations, check-in, check-out, and generate invoices. Employees can manage room availability, maintain customer profiles, and oversee housekeeping schedules. The project includes developing a set of RESTful APIs using Spring Boot to support these functionalities and the necessary front-end interfaces for web and mobile platforms.
 
-![Alt text](/Images/img.png "ER Diagram")
 
 ## Features
 
