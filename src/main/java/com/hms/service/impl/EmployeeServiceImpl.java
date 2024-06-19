@@ -34,7 +34,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee newEmployee = mapToEntity(employee);
         Role role = roleRepository.findByName("ROLE_EMPLOYEE").get();
         newEmployee.setRole(Collections.singleton(role));
-        //employeeRepository.save(newEmployee);
         return mapToDto(employeeRepository.save(newEmployee));
     }
 

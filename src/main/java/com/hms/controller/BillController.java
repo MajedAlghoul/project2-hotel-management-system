@@ -1,9 +1,9 @@
 package com.hms.controller;
 
-import com.hms.dto.ReservationDto;
+import com.hms.dto.BillDto;
 import com.hms.exception.IllegalInputException;
 import com.hms.responsebody.StandardMessageBody;
-import com.hms.service.ReservationService;
+import com.hms.service.BillService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,23 +15,23 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 
 /**
- * Contains endpoints related to the Reservation resource.
+ * Contains endpoints related to the Bill resource.
  */
-@RequestMapping("/api/reservation")
+@RequestMapping("/api/bill")
 @RestController
 @Validated
-@Tag(name = "Reservation")
-public class ReservationController {
-    private final ReservationService reservationService;
+@Tag(name = "Bill")
+public class BillController {
+    private final BillService billService;
 
     @Autowired
-    public ReservationController(ReservationService reservationService) {
-        this.reservationService = reservationService;
+    public BillController(BillService billService) {
+        this.billService = billService;
     }
 
     @Operation(
-            description = "Endpoint for fetching a list of Reservations",
-            summary = "Fetch Reservations",
+            description = "Endpoint for fetching a list of Bills",
+            summary = "Fetch Bills",
             responses = {
                     @ApiResponse(
                             description = "Success",
@@ -44,22 +44,22 @@ public class ReservationController {
             }
     )
     @GetMapping(produces = "application/json")
-    public ResponseEntity<ReservationDto[]> getReservations(@Validated @RequestParam String pageNumber, @RequestParam String pageSize) {
+    public ResponseEntity<BillDto[]> getBills(@Validated @RequestParam String pageNumber, @RequestParam String pageSize) {
         int pageNumberInt, pageSizeInt;
         try{
             pageNumberInt = Integer.parseInt(pageNumber);
             pageSizeInt = Integer.parseInt(pageSize);
             if(pageNumberInt < 0 || pageNumberInt > pageSizeInt || pageSizeInt < 1)
-                throw new IllegalInputException("Reservation", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
+                throw new IllegalInputException("Bill", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
         } catch(NumberFormatException e){
-            throw new IllegalInputException("Reservation", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
+            throw new IllegalInputException("Bill", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
         }
-        return ResponseEntity.ok().body(reservationService.getReservations(pageNumberInt, pageSizeInt));
+        return ResponseEntity.ok().body(billService.getBills(pageNumberInt, pageSizeInt));
     }
 
     @Operation(
-            description = "Endpoint for replacing an Reservation",
-            summary = "Replace Reservation",
+            description = "Endpoint for replacing an Bill",
+            summary = "Replace Bill",
             responses = {
                     @ApiResponse(
                             description = "Success",
@@ -72,13 +72,13 @@ public class ReservationController {
             }
     )
     @PutMapping(produces = "application/json")
-    public ResponseEntity<ReservationDto> putReservation(@Validated @RequestBody ReservationDto reservation) {
-        return ResponseEntity.ok().body(reservationService.replaceReservation(reservation));
+    public ResponseEntity<BillDto> putBill(@Validated @RequestBody BillDto bill) {
+        return ResponseEntity.ok().body(billService.replaceBill(bill));
     }
 
     @Operation(
-            description = "Endpoint for partially updating an Reservation",
-            summary = "Partially update Reservation",
+            description = "Endpoint for partially updating an Bill",
+            summary = "Partially update Bill",
             responses = {
                     @ApiResponse(
                             description = "Success",
@@ -91,13 +91,13 @@ public class ReservationController {
             }
     )
     @PatchMapping(produces = "application/json")
-    public ResponseEntity<ReservationDto> patchReservation(@Validated @RequestBody ReservationDto reservation) {
-        return ResponseEntity.ok().body(reservationService.modifyReservation(reservation));
+    public ResponseEntity<BillDto> patchBill(@Validated @RequestBody BillDto bill) {
+        return ResponseEntity.ok().body(billService.modifyBill(bill));
     }
 
     @Operation(
-            description = "Endpoint for deleting an Reservation",
-            summary = "Delete Reservation",
+            description = "Endpoint for deleting an Bill",
+            summary = "Delete Bill",
             responses = {
                     @ApiResponse(
                             description = "Success",
@@ -109,21 +109,21 @@ public class ReservationController {
                     )
             }
     )
-    @DeleteMapping(value = "/{reservation_id}", produces = "application/json")
-    public ResponseEntity<HashMap<String, String>> deleteReservation(@Validated @PathVariable String reservation_id) {
+    @DeleteMapping(value = "/{bill_id}", produces = "application/json")
+    public ResponseEntity<HashMap<String, String>> deleteBill(@Validated @PathVariable String bill_id) {
         long id;
         try{
-            id = Integer.parseInt(reservation_id);
+            id = Integer.parseInt(bill_id);
         } catch(NumberFormatException e){
-            throw new IllegalInputException("Reservation", "reservation_id", reservation_id);
+            throw new IllegalInputException("Bill", "bill_id", bill_id);
         }
-        reservationService.deleteReservation(id);
+        billService.deleteBill(id);
         return ResponseEntity.ok().body(new StandardMessageBody("Deleted successfully.").getContent());
     }
 
     @Operation(
-            description = "Endpoint for getting an Reservation",
-            summary = "Get Reservation",
+            description = "Endpoint for getting an Bill",
+            summary = "Get Bill",
             responses = {
                     @ApiResponse(
                             description = "Success",
@@ -135,14 +135,14 @@ public class ReservationController {
                     )
             }
     )
-    @GetMapping(value = "/{reservation_id}", produces = "application/json")
-    public ResponseEntity<ReservationDto> getReservation(@Validated @PathVariable String reservation_id) {
+    @GetMapping(value = "/{bill_id}", produces = "application/json")
+    public ResponseEntity<BillDto> getBill(@Validated @PathVariable String bill_id) {
         long id;
         try{
-            id = Integer.parseInt(reservation_id);
+            id = Integer.parseInt(bill_id);
         } catch(NumberFormatException e){
-            throw new IllegalInputException("Reservation", "reservation_id", reservation_id);
+            throw new IllegalInputException("Bill", "bill_id", bill_id);
         }
-        return ResponseEntity.ok().body(reservationService.getReservationById(id));
+        return ResponseEntity.ok().body(billService.getBillById(id));
     }
 }
