@@ -4,6 +4,8 @@ import com.hms.dto.TaskDto;
 import com.hms.exception.IllegalInputException;
 import com.hms.responsebody.StandardMessageBody;
 import com.hms.service.TaskService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +19,8 @@ import java.util.HashMap;
  */
 @RequestMapping("/api/task")
 @RestController
-@Tag(name = "nada")
+@Validated
+@Tag(name = "Task")
 public class TaskController {
     private final TaskService taskService;
 
@@ -26,11 +29,20 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    @PostMapping(produces = "application/json")
-    public ResponseEntity<TaskDto> postTask(@Validated @RequestBody TaskDto task) {
-        return ResponseEntity.ok().body(taskService.postTask(task));
-    }
-
+    @Operation(
+            description = "Endpoint for fetching a list of Tasks",
+            summary = "Fetch Tasks",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200"
+                    ),
+                    @ApiResponse(
+                            description = "Unauthorized",
+                            responseCode = "403"
+                    )
+            }
+    )
     @GetMapping(produces = "application/json")
     public ResponseEntity<TaskDto[]> getTasks(@Validated @RequestParam String pageNumber, @RequestParam String pageSize) {
         int pageNumberInt, pageSizeInt;
@@ -45,16 +57,58 @@ public class TaskController {
         return ResponseEntity.ok().body(taskService.getTasks(pageNumberInt, pageSizeInt));
     }
 
+    @Operation(
+            description = "Endpoint for replacing an Task",
+            summary = "Replace Task",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200"
+                    ),
+                    @ApiResponse(
+                            description = "Unauthorized",
+                            responseCode = "403"
+                    )
+            }
+    )
     @PutMapping(produces = "application/json")
     public ResponseEntity<TaskDto> putTask(@Validated @RequestBody TaskDto task) {
         return ResponseEntity.ok().body(taskService.replaceTask(task));
     }
 
+    @Operation(
+            description = "Endpoint for partially updating an Task",
+            summary = "Partially update Task",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200"
+                    ),
+                    @ApiResponse(
+                            description = "Unauthorized",
+                            responseCode = "403"
+                    )
+            }
+    )
     @PatchMapping(produces = "application/json")
     public ResponseEntity<TaskDto> patchTask(@Validated @RequestBody TaskDto task) {
         return ResponseEntity.ok().body(taskService.modifyTask(task));
     }
 
+    @Operation(
+            description = "Endpoint for deleting an Task",
+            summary = "Delete Task",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200"
+                    ),
+                    @ApiResponse(
+                            description = "Unauthorized",
+                            responseCode = "403"
+                    )
+            }
+    )
     @DeleteMapping(value = "/{task_id}", produces = "application/json")
     public ResponseEntity<HashMap<String, String>> deleteTask(@Validated @PathVariable String task_id) {
         long id;
@@ -67,6 +121,20 @@ public class TaskController {
         return ResponseEntity.ok().body(new StandardMessageBody("Deleted successfully.").getContent());
     }
 
+    @Operation(
+            description = "Endpoint for getting an Task",
+            summary = "Get Task",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200"
+                    ),
+                    @ApiResponse(
+                            description = "Unauthorized",
+                            responseCode = "403"
+                    )
+            }
+    )
     @GetMapping(value = "/{task_id}", produces = "application/json")
     public ResponseEntity<TaskDto> getTask(@Validated @PathVariable String task_id) {
         long id;
