@@ -19,6 +19,6 @@ import java.util.Set;
 @Entity // Specifies to the JPA that this class is an entity to be mapped to a database table
 //@Table(name = "customer") // Specifies to the JPA the table details to persist the entity in the database
 public class Customer extends User{
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "customerEmail", cascade = CascadeType.ALL)
     private Set<Reservation> reservation;
 }

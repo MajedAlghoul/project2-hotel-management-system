@@ -17,7 +17,7 @@ import java.util.HashMap;
 /**
  * Contains endpoints related to the Task resource.
  */
-@RequestMapping("/api/task")
+@RequestMapping("/api/v2/task")
 @RestController
 @Validated
 @Tag(name = "Task")

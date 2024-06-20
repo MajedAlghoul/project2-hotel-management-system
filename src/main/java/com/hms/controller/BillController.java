@@ -1,9 +1,9 @@
 package com.hms.controller;
 
-import com.hms.dto.EmployeeDto;
+import com.hms.dto.BillDto;
 import com.hms.exception.IllegalInputException;
 import com.hms.responsebody.StandardMessageBody;
-import com.hms.service.EmployeeService;
+import com.hms.service.BillService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,23 +15,23 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 
 /**
- * Contains endpoints related to the Employee resource.
+ * Contains endpoints related to the Bill resource.
  */
-@RequestMapping("/api/v1/employee")
+@RequestMapping("/api/v2/bill")
 @RestController
 @Validated
-@Tag(name = "Employee")
-public class EmployeeController {
-    private final EmployeeService employeeService;
+@Tag(name = "Bill")
+public class BillController {
+    private final BillService billService;
 
     @Autowired
-    public EmployeeController(EmployeeService employeeService) {
-        this.employeeService = employeeService;
+    public BillController(BillService billService) {
+        this.billService = billService;
     }
 
     @Operation(
-            description = "Endpoint for fetching a list of Employees",
-            summary = "Fetch Employees",
+            description = "Endpoint for fetching a list of Bills",
+            summary = "Fetch Bills",
             responses = {
                     @ApiResponse(
                             description = "Success",
@@ -44,22 +44,22 @@ public class EmployeeController {
             }
     )
     @GetMapping(produces = "application/json")
-    public ResponseEntity<EmployeeDto[]> getEmployees(@Validated @RequestParam String pageNumber, @RequestParam String pageSize) {
+    public ResponseEntity<BillDto[]> getBills(@Validated @RequestParam String pageNumber, @RequestParam String pageSize) {
         int pageNumberInt, pageSizeInt;
         try{
             pageNumberInt = Integer.parseInt(pageNumber);
             pageSizeInt = Integer.parseInt(pageSize);
             if(pageNumberInt < 0 || pageNumberInt > pageSizeInt || pageSizeInt < 1)
-                throw new IllegalInputException("Employee", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
+                throw new IllegalInputException("Bill", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
         } catch(NumberFormatException e){
-            throw new IllegalInputException("Employee", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
+            throw new IllegalInputException("Bill", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
         }
-        return ResponseEntity.ok().body(employeeService.getEmployees(pageNumberInt, pageSizeInt));
+        return ResponseEntity.ok().body(billService.getBills(pageNumberInt, pageSizeInt));
     }
 
     @Operation(
-            description = "Endpoint for replacing an Employee",
-            summary = "Replace Employee",
+            description = "Endpoint for replacing an Bill",
+            summary = "Replace Bill",
             responses = {
                     @ApiResponse(
                             description = "Success",
@@ -72,13 +72,13 @@ public class EmployeeController {
             }
     )
     @PutMapping(produces = "application/json")
-    public ResponseEntity<EmployeeDto> putEmployee(@Validated @RequestBody EmployeeDto employee) {
-        return ResponseEntity.ok().body(employeeService.replaceEmployee(employee));
+    public ResponseEntity<BillDto> putBill(@Validated @RequestBody BillDto bill) {
+        return ResponseEntity.ok().body(billService.replaceBill(bill));
     }
 
     @Operation(
-            description = "Endpoint for partially updating an Employee",
-            summary = "Partially update Employee",
+            description = "Endpoint for partially updating an Bill",
+            summary = "Partially update Bill",
             responses = {
                     @ApiResponse(
                             description = "Success",
@@ -91,13 +91,13 @@ public class EmployeeController {
             }
     )
     @PatchMapping(produces = "application/json")
-    public ResponseEntity<EmployeeDto> patchEmployee(@Validated @RequestBody EmployeeDto employee) {
-        return ResponseEntity.ok().body(employeeService.modifyEmployee(employee));
+    public ResponseEntity<BillDto> patchBill(@Validated @RequestBody BillDto bill) {
+        return ResponseEntity.ok().body(billService.modifyBill(bill));
     }
 
     @Operation(
-            description = "Endpoint for deleting an Employee",
-            summary = "Delete Employee",
+            description = "Endpoint for deleting an Bill",
+            summary = "Delete Bill",
             responses = {
                     @ApiResponse(
                             description = "Success",
@@ -109,21 +109,21 @@ public class EmployeeController {
                     )
             }
     )
-    @DeleteMapping(value = "/{employee_id}", produces = "application/json")
-    public ResponseEntity<HashMap<String, String>> deleteEmployee(@Validated @PathVariable String employee_id) {
+    @DeleteMapping(value = "/{bill_id}", produces = "application/json")
+    public ResponseEntity<HashMap<String, String>> deleteBill(@Validated @PathVariable String bill_id) {
         long id;
         try{
-            id = Integer.parseInt(employee_id);
+            id = Integer.parseInt(bill_id);
         } catch(NumberFormatException e){
-            throw new IllegalInputException("Employee", "employee_id", employee_id);
+            throw new IllegalInputException("Bill", "bill_id", bill_id);
         }
-        employeeService.deleteEmployee(id);
+        billService.deleteBill(id);
         return ResponseEntity.ok().body(new StandardMessageBody("Deleted successfully.").getContent());
     }
 
     @Operation(
-            description = "Endpoint for getting an Employee",
-            summary = "Get Employee",
+            description = "Endpoint for getting an Bill",
+            summary = "Get Bill",
             responses = {
                     @ApiResponse(
                             description = "Success",
@@ -135,14 +135,14 @@ public class EmployeeController {
                     )
             }
     )
-    @GetMapping(value = "/{employee_id}", produces = "application/json")
-    public ResponseEntity<EmployeeDto> getEmployee(@Validated @PathVariable String employee_id) {
+    @GetMapping(value = "/{bill_id}", produces = "application/json")
+    public ResponseEntity<BillDto> getBill(@Validated @PathVariable String bill_id) {
         long id;
         try{
-            id = Integer.parseInt(employee_id);
+            id = Integer.parseInt(bill_id);
         } catch(NumberFormatException e){
-            throw new IllegalInputException("Employee", "employee_id", employee_id);
+            throw new IllegalInputException("Bill", "bill_id", bill_id);
         }
-        return ResponseEntity.ok().body(employeeService.getEmployeeById(id));
+        return ResponseEntity.ok().body(billService.getBillById(id));
     }
 }
