@@ -2,9 +2,11 @@ package com.hms.service;
 
 import com.hms.dto.ReservationDto;
 
+import java.util.List;
+
 public interface ReservationService {
     ReservationDto postReservation(ReservationDto employee);
-    ReservationDto[] getReservations(Integer pageNumber, Integer pageSize);
+    List<ReservationDto> getReservations();
     ReservationDto replaceReservation(ReservationDto employee);
     ReservationDto modifyReservation(ReservationDto employee);
     void deleteReservation(Long employee_id);

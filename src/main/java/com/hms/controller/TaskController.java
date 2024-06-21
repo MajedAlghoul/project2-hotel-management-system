@@ -9,10 +9,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Contains endpoints related to the Task resource.
@@ -29,6 +31,29 @@ public class TaskController {
         this.taskService = taskService;
     }
 
+
+    @Operation(
+            description = "Endpoint for creating a Task",
+            summary = "Create Task",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200"
+
+                    ),
+                    @ApiResponse(
+                            description = "Unauthorized",
+                            responseCode = "403"
+                    ),
+            }
+    )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    @PostMapping(produces = "application/json")
+    public ResponseEntity<?> registerTask (@Validated @RequestBody TaskDto taskDto){
+
+        return ResponseEntity.ok().body(taskService.postTask(taskDto));
+    }
+
     @Operation(
             description = "Endpoint for fetching a list of Tasks",
             summary = "Fetch Tasks",
@@ -43,18 +68,10 @@ public class TaskController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @GetMapping(produces = "application/json")
-    public ResponseEntity<TaskDto[]> getTasks(@Validated @RequestParam String pageNumber, @RequestParam String pageSize) {
-        int pageNumberInt, pageSizeInt;
-        try{
-            pageNumberInt = Integer.parseInt(pageNumber);
-            pageSizeInt = Integer.parseInt(pageSize);
-            if(pageNumberInt < 0 || pageNumberInt > pageSizeInt || pageSizeInt < 1)
-                throw new IllegalInputException("Task", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
-        } catch(NumberFormatException e){
-            throw new IllegalInputException("Task", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
-        }
-        return ResponseEntity.ok().body(taskService.getTasks(pageNumberInt, pageSizeInt));
+    public ResponseEntity<List<TaskDto>> getTasks() {
+        return ResponseEntity.ok().body(taskService.getTasks());
     }
 
     @Operation(
@@ -71,6 +88,7 @@ public class TaskController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @PutMapping(produces = "application/json")
     public ResponseEntity<TaskDto> putTask(@Validated @RequestBody TaskDto task) {
         return ResponseEntity.ok().body(taskService.replaceTask(task));
@@ -90,8 +108,9 @@ public class TaskController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @PatchMapping(produces = "application/json")
-    public ResponseEntity<TaskDto> patchTask(@Validated @RequestBody TaskDto task) {
+    public ResponseEntity<TaskDto> patchTask(@RequestBody TaskDto task) {
         return ResponseEntity.ok().body(taskService.modifyTask(task));
     }
 
@@ -109,6 +128,7 @@ public class TaskController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @DeleteMapping(value = "/{task_id}", produces = "application/json")
     public ResponseEntity<HashMap<String, String>> deleteTask(@Validated @PathVariable String task_id) {
         long id;
@@ -135,6 +155,7 @@ public class TaskController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @GetMapping(value = "/{task_id}", produces = "application/json")
     public ResponseEntity<TaskDto> getTask(@Validated @PathVariable String task_id) {
         long id;

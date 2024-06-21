@@ -10,7 +10,6 @@ import com.hms.service.EmployeeService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -71,9 +70,6 @@ public class AuthenticationController {
     public ResponseEntity<?> registerCustomer (@Validated @RequestBody CustomerDto signUpDto){
 
         return ResponseEntity.ok().body(customerService.postCustomer(signUpDto));
-
-        //return new ResponseEntity<>("Customer registered successfully",
-        //        HttpStatus.OK);
     }
     @Operation(
             description = "Endpoint for creating an Employee",
@@ -95,8 +91,5 @@ public class AuthenticationController {
     public ResponseEntity<?> registerEmployee (@Validated @RequestBody EmployeeDto signUpDto){
 
         return ResponseEntity.ok().body(employeeService.postEmployee(signUpDto));
-
-        //return new ResponseEntity<>("Employee registered successfully",
-        //        HttpStatus.OK);
     }
 }

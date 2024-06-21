@@ -2,9 +2,11 @@ package com.hms.service.impl;
 
 import com.hms.dto.TaskDto;
 import com.hms.exception.DuplicateResourceException;
+import com.hms.exception.NoContentException;
 import com.hms.exception.ResourceNotFoundException;
 import com.hms.model.Task;
 import com.hms.model.Role;
+import com.hms.repository.EmployeeRepository;
 import com.hms.repository.TaskRepository;
 import com.hms.repository.RoleRepository;
 import com.hms.service.TaskService;
@@ -14,18 +16,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service // Indicates that this class is a service provider (contains business functionalities)
 public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
-
+    private final EmployeeRepository employeeRepository;
     @Autowired
-    public TaskServiceImpl(TaskRepository taskRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
-        this.roleRepository = roleRepository;
+    public TaskServiceImpl(TaskRepository taskRepository,EmployeeRepository employeeRepository) {
         this.taskRepository = taskRepository;
-        this.passwordEncoder = passwordEncoder;
+        this.employeeRepository = employeeRepository;
     }
 
     public TaskDto postTask(TaskDto task) {
@@ -39,20 +40,17 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskDto[] getTasks(Integer pageNumber, Integer pageSize) {
-        Object[] tasksObjects = taskRepository.findAll(PageRequest.of(pageNumber, pageSize)).getContent().toArray();
-        TaskDto[] tasksDtos = new TaskDto[tasksObjects.length];
-        for(int i = 0; i < tasksObjects.length; i++)
-            if (tasksObjects[i] instanceof Task)
-                tasksDtos[i] = mapToDto((Task) tasksObjects[i]);
-        if(tasksDtos.length == 0)
-            throw new ResourceNotFoundException("Task", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
-        return tasksDtos;
+    public List<TaskDto> getTasks() {
+        List<Task> tasks = taskRepository.findAll();
+        if (tasks.isEmpty()) {
+            throw new NoContentException("No tasks registered yet");
+        }
+        return tasks.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
     @Override
     public TaskDto replaceTask(TaskDto task) {
-        if(!taskRepository.existsByName(task.getName()))
+        if(!taskRepository.existsById(task.getId()))
             throw new ResourceNotFoundException("Task", "task_id", String.valueOf(task.getName()));
         return mapToDto(taskRepository.save(mapToEntity(task)));
     }
@@ -85,6 +83,7 @@ public class TaskServiceImpl implements TaskService {
         return TaskDto.builder()
                 .id(task.getId())
                 .name(task.getName())
+                .employee(task.getAssignedTo().getEmail())
                 .description(task.getDescription())
                 .build();
     }
@@ -92,7 +91,7 @@ public class TaskServiceImpl implements TaskService {
     private Task mapToEntity(TaskDto taskDto) {
         Task task = new Task();
         task.setName(taskDto.getName());
-        task.setName(taskDto.getName());
+        task.setAssignedTo(employeeRepository.findByEmail(taskDto.getEmployee()).get() );
         task.setDescription(taskDto.getDescription());
         return task;
     }

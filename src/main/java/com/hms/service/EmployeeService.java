@@ -2,9 +2,11 @@ package com.hms.service;
 
 import com.hms.dto.EmployeeDto;
 
+import java.util.List;
+
 public interface EmployeeService {
     EmployeeDto postEmployee(EmployeeDto employee);
-    EmployeeDto[] getEmployees(Integer pageNumber, Integer pageSize);
+    List<EmployeeDto> getEmployees();
     EmployeeDto replaceEmployee(EmployeeDto employee);
     EmployeeDto modifyEmployee(EmployeeDto employee);
     void deleteEmployee(Long employee_id);

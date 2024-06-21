@@ -9,10 +9,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Contains endpoints related to the Employee resource.
@@ -30,6 +32,28 @@ public class EmployeeController {
     }
 
     @Operation(
+            description = "Endpoint for creating a Employee",
+            summary = "Create Employee",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200"
+
+                    ),
+                    @ApiResponse(
+                            description = "Unauthorized",
+                            responseCode = "403"
+                    ),
+            }
+    )
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping(produces = "application/json")
+    public ResponseEntity<?> registerEmployee (@Validated @RequestBody EmployeeDto employeeDto){
+
+        return ResponseEntity.ok().body(employeeService.postEmployee(employeeDto));
+    }
+
+    @Operation(
             description = "Endpoint for fetching a list of Employees",
             summary = "Fetch Employees",
             responses = {
@@ -43,18 +67,10 @@ public class EmployeeController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(produces = "application/json")
-    public ResponseEntity<EmployeeDto[]> getEmployees(@Validated @RequestParam String pageNumber, @RequestParam String pageSize) {
-        int pageNumberInt, pageSizeInt;
-        try{
-            pageNumberInt = Integer.parseInt(pageNumber);
-            pageSizeInt = Integer.parseInt(pageSize);
-            if(pageNumberInt < 0 || pageNumberInt > pageSizeInt || pageSizeInt < 1)
-                throw new IllegalInputException("Employee", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
-        } catch(NumberFormatException e){
-            throw new IllegalInputException("Employee", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
-        }
-        return ResponseEntity.ok().body(employeeService.getEmployees(pageNumberInt, pageSizeInt));
+    public ResponseEntity<List<EmployeeDto>> getEmployees() {
+        return ResponseEntity.ok().body(employeeService.getEmployees());
     }
 
     @Operation(
@@ -71,6 +87,7 @@ public class EmployeeController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping(produces = "application/json")
     public ResponseEntity<EmployeeDto> putEmployee(@Validated @RequestBody EmployeeDto employee) {
         return ResponseEntity.ok().body(employeeService.replaceEmployee(employee));
@@ -90,6 +107,7 @@ public class EmployeeController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PatchMapping(produces = "application/json")
     public ResponseEntity<EmployeeDto> patchEmployee(@Validated @RequestBody EmployeeDto employee) {
         return ResponseEntity.ok().body(employeeService.modifyEmployee(employee));
@@ -109,6 +127,7 @@ public class EmployeeController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @DeleteMapping(value = "/{employee_id}", produces = "application/json")
     public ResponseEntity<HashMap<String, String>> deleteEmployee(@Validated @PathVariable String employee_id) {
         long id;
@@ -135,6 +154,7 @@ public class EmployeeController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @GetMapping(value = "/{employee_id}", produces = "application/json")
     public ResponseEntity<EmployeeDto> getEmployee(@Validated @PathVariable String employee_id) {
         long id;

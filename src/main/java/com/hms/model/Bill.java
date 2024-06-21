@@ -20,8 +20,12 @@ public class Bill {
     @Id
     @GeneratedValue
     private Long id;
-    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL)
-    private Set<Reservation> reservation;
+    @OneToOne
+    @MapsId
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @JoinColumn(name = "reservation_id")
+    private Reservation reservation;
     private Long invoice_total;
     private Long paid;
     private Long due;

@@ -1,9 +1,12 @@
 package com.hms.service.impl;
 
 import com.hms.dto.EmployeeDto;
+import com.hms.dto.EmployeeDto;
 import com.hms.exception.DuplicateResourceException;
+import com.hms.exception.NoContentException;
 import com.hms.model.Employee;
 import com.hms.model.Role;
+import com.hms.model.Employee;
 import com.hms.repository.EmployeeRepository;
 import com.hms.exception.ResourceNotFoundException;
 import com.hms.repository.RoleRepository;
@@ -14,6 +17,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service // Indicates that this class is a service provider (contains business functionalities)
 public class EmployeeServiceImpl implements EmployeeService {
@@ -32,26 +39,27 @@ public class EmployeeServiceImpl implements EmployeeService {
         if(employeeRepository.existsByEmail(employee.getEmail()))
             throw new DuplicateResourceException("Employee", "employee_id", employee.getEmail());
         Employee newEmployee = mapToEntity(employee);
-        Role role = roleRepository.findByName("ROLE_EMPLOYEE").get();
-        newEmployee.setRole(Collections.singleton(role));
+        Role role1 = roleRepository.findByName("ROLE_EMPLOYEE").get();
+        Role role2 = roleRepository.findByName("ROLE_CUSTOMER").get();
+        Set<Role> roles = new HashSet<>();
+        roles.add(role1);
+        roles.add(role2);
+        newEmployee.setRole(roles);
         return mapToDto(employeeRepository.save(newEmployee));
     }
 
     @Override
-    public EmployeeDto[] getEmployees(Integer pageNumber, Integer pageSize) {
-        Object[] employeesObjects = employeeRepository.findAll(PageRequest.of(pageNumber, pageSize)).getContent().toArray();
-        EmployeeDto[] employeesDtos = new EmployeeDto[employeesObjects.length];
-        for(int i = 0; i < employeesObjects.length; i++)
-            if (employeesObjects[i] instanceof Employee)
-                employeesDtos[i] = mapToDto((Employee) employeesObjects[i]);
-        if(employeesDtos.length == 0)
-            throw new ResourceNotFoundException("Employee", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
-        return employeesDtos;
+    public List<EmployeeDto> getEmployees() {
+        List<Employee> employees = employeeRepository.findAll();
+        if (employees.isEmpty()) {
+            throw new NoContentException("No employees registered yet");
+        }
+        return employees.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
     @Override
     public EmployeeDto replaceEmployee(EmployeeDto employee) {
-        if(!employeeRepository.existsByEmail(employee.getEmail()))
+        if(!employeeRepository.existsById(employee.getId()))
             throw new ResourceNotFoundException("Employee", "employee_id", String.valueOf(employee.getEmail()));
         return mapToDto(employeeRepository.save(mapToEntity(employee)));
     }
@@ -85,6 +93,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .email(employee.getEmail())
                 .name(employee.getName())
                 .passwordHash(employee.getPasswordHash())
+                .id(employee.getId())
                 .build();
     }
 

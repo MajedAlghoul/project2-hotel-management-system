@@ -2,45 +2,52 @@ package com.hms.service.impl;
 
 import com.hms.dto.ReservationDto;
 import com.hms.exception.DuplicateResourceException;
+import com.hms.exception.NoContentException;
 import com.hms.exception.ResourceNotFoundException;
 import com.hms.model.Reservation;
 import com.hms.model.Role;
+import com.hms.model.Reservation;
+import com.hms.model.Room;
+import com.hms.repository.CustomerRepository;
 import com.hms.repository.ReservationRepository;
 import com.hms.repository.RoleRepository;
+import com.hms.repository.RoomRepository;
 import com.hms.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service // Indicates that this class is a service provider (contains business functionalities)
 public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository reservationRepository;
+    private final CustomerRepository customerRepository;
+    private final RoomRepository roomRepository;
 
     @Autowired
-    public ReservationServiceImpl(ReservationRepository reservationRepository) {
+    public ReservationServiceImpl(ReservationRepository reservationRepository, CustomerRepository customerRepository, RoomRepository roomRepository) {
         this.reservationRepository = reservationRepository;
+        this.customerRepository = customerRepository;
+        this.roomRepository = roomRepository;
     }
 
     public ReservationDto postReservation(ReservationDto reservation) {
-        if(reservationRepository.existsById(reservation.getId()))
-            throw new DuplicateResourceException("Reservation", "reservation_id", String.valueOf(reservation.getId()));
+        //if(reservationRepository.existsById(reservation.getId()))
+        //    throw new DuplicateResourceException("Reservation", "reservation_id", String.valueOf(reservation.getId()));
         Reservation newReservation = mapToEntity(reservation);
         return mapToDto(reservationRepository.save(newReservation));
     }
 
     @Override
-    public ReservationDto[] getReservations(Integer pageNumber, Integer pageSize) {
-        Object[] reservationsObjects = reservationRepository.findAll(PageRequest.of(pageNumber, pageSize)).getContent().toArray();
-        ReservationDto[] reservationsDtos = new ReservationDto[reservationsObjects.length];
-        for(int i = 0; i < reservationsObjects.length; i++)
-            if (reservationsObjects[i] instanceof Reservation)
-                reservationsDtos[i] = mapToDto((Reservation) reservationsObjects[i]);
-        if(reservationsDtos.length == 0)
-            throw new ResourceNotFoundException("Reservation", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
-        return reservationsDtos;
+    public List<ReservationDto> getReservations() {
+        List<Reservation> reservations = reservationRepository.findAll();
+        if (reservations.isEmpty()) {
+            throw new NoContentException("No reservations registered yet");
+        }
+        return reservations.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
     @Override
@@ -56,9 +63,9 @@ public class ReservationServiceImpl implements ReservationService {
         if(!partialReservation.getCheckingStatus().isEmpty())
             originalReservation.setCheckingStatus(partialReservation.getCheckingStatus());
         if(partialReservation.getCheckin() != null)
-            originalReservation.setCheckin(partialReservation.getCheckin());
+            originalReservation.setCheckInData(partialReservation.getCheckin());
         if(partialReservation.getCheckout() != null)
-            originalReservation.setCheckout(partialReservation.getCheckout());
+            originalReservation.setCheckOutData(partialReservation.getCheckout());
         reservationRepository.save(originalReservation);
         return mapToDto(originalReservation);
     }
@@ -78,19 +85,24 @@ public class ReservationServiceImpl implements ReservationService {
 
     private ReservationDto mapToDto(Reservation reservation) {
         return ReservationDto.builder()
-                .customerEmail(reservation.getCustomerEmail())
+                .customerEmail(reservation.getCustomer().getEmail())
                 .checkingStatus(reservation.getCheckingStatus())
-                .checkin(reservation.getCheckin())
-                .checkout(reservation.getCheckout())
+                .checkin(reservation.getCheckInData())
+                .checkout(reservation.getCheckOutData())
+                .room(new ArrayList<>(reservation.getRoom()).get(0).getId())
+                .id(reservation.getId())
                 .build();
     }
 
     private Reservation mapToEntity(ReservationDto reservationDto) {
+        Set<Room> rooms = new HashSet<>();
+        rooms.add(roomRepository.findById(reservationDto.getRoom()).get() ) ;
         return Reservation.builder()
-                .customerEmail(reservationDto.getCustomerEmail())
+                .customer(customerRepository.findByEmail(reservationDto.getCustomerEmail()).get() )
                 .checkingStatus(reservationDto.getCheckingStatus())
-                .checkin(reservationDto.getCheckin())
-                .checkout(reservationDto.getCheckout())
+                .checkInData(reservationDto.getCheckin())
+                .checkOutData(reservationDto.getCheckout())
+                .room(rooms)
                 .build();
     }
 }

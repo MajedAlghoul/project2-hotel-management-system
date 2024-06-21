@@ -2,9 +2,6 @@ package com.hms.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
-
-import java.util.List;
 import java.util.Set;
 
 /**

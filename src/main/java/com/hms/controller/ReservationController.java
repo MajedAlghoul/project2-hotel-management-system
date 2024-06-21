@@ -9,10 +9,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Contains endpoints related to the Reservation resource.
@@ -30,6 +32,28 @@ public class ReservationController {
     }
 
     @Operation(
+            description = "Endpoint for creating a Reservation",
+            summary = "Create Reservation",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200"
+
+                    ),
+                    @ApiResponse(
+                            description = "Unauthorized",
+                            responseCode = "403"
+                    ),
+            }
+    )
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @PostMapping(produces = "application/json")
+    public ResponseEntity<?> registerReservation (@Validated @RequestBody ReservationDto reservationDto){
+
+        return ResponseEntity.ok().body(reservationService.postReservation(reservationDto));
+    }
+
+    @Operation(
             description = "Endpoint for fetching a list of Reservations",
             summary = "Fetch Reservations",
             responses = {
@@ -43,18 +67,10 @@ public class ReservationController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @GetMapping(produces = "application/json")
-    public ResponseEntity<ReservationDto[]> getReservations(@Validated @RequestParam String pageNumber, @RequestParam String pageSize) {
-        int pageNumberInt, pageSizeInt;
-        try{
-            pageNumberInt = Integer.parseInt(pageNumber);
-            pageSizeInt = Integer.parseInt(pageSize);
-            if(pageNumberInt < 0 || pageNumberInt > pageSizeInt || pageSizeInt < 1)
-                throw new IllegalInputException("Reservation", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
-        } catch(NumberFormatException e){
-            throw new IllegalInputException("Reservation", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
-        }
-        return ResponseEntity.ok().body(reservationService.getReservations(pageNumberInt, pageSizeInt));
+    public ResponseEntity<List<ReservationDto>> getReservations() {
+        return ResponseEntity.ok().body(reservationService.getReservations());
     }
 
     @Operation(
@@ -71,6 +87,7 @@ public class ReservationController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @PutMapping(produces = "application/json")
     public ResponseEntity<ReservationDto> putReservation(@Validated @RequestBody ReservationDto reservation) {
         return ResponseEntity.ok().body(reservationService.replaceReservation(reservation));
@@ -90,6 +107,7 @@ public class ReservationController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @PatchMapping(produces = "application/json")
     public ResponseEntity<ReservationDto> patchReservation(@Validated @RequestBody ReservationDto reservation) {
         return ResponseEntity.ok().body(reservationService.modifyReservation(reservation));
@@ -109,6 +127,7 @@ public class ReservationController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @DeleteMapping(value = "/{reservation_id}", produces = "application/json")
     public ResponseEntity<HashMap<String, String>> deleteReservation(@Validated @PathVariable String reservation_id) {
         long id;
@@ -135,6 +154,7 @@ public class ReservationController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     @GetMapping(value = "/{reservation_id}", produces = "application/json")
     public ResponseEntity<ReservationDto> getReservation(@Validated @PathVariable String reservation_id) {
         long id;

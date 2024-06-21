@@ -8,6 +8,7 @@ import lombok.Data;
 @Data // Generates Getters, Setters, toString, hashCode, & equals methods for non-transient fields
 @Builder // Generates a static Builder-Design-Pattern builder method
 public class CustomerDto {
+    private Long id;
     @NotBlank(message = "Email cannot be blank")
     @Email(message = "Email should be valid", regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
     private String email;

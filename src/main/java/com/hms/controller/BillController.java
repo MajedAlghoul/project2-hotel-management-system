@@ -9,10 +9,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Contains endpoints related to the Bill resource.
@@ -30,6 +32,28 @@ public class BillController {
     }
 
     @Operation(
+            description = "Endpoint for creating a Bill",
+            summary = "Create Bill",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200"
+
+                    ),
+                    @ApiResponse(
+                            description = "Unauthorized",
+                            responseCode = "403"
+                    ),
+            }
+    )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    @PostMapping(produces = "application/json")
+    public ResponseEntity<?> registerBill (@Validated @RequestBody BillDto billDto){
+
+        return ResponseEntity.ok().body(billService.postBill(billDto));
+    }
+
+    @Operation(
             description = "Endpoint for fetching a list of Bills",
             summary = "Fetch Bills",
             responses = {
@@ -43,18 +67,10 @@ public class BillController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @GetMapping(produces = "application/json")
-    public ResponseEntity<BillDto[]> getBills(@Validated @RequestParam String pageNumber, @RequestParam String pageSize) {
-        int pageNumberInt, pageSizeInt;
-        try{
-            pageNumberInt = Integer.parseInt(pageNumber);
-            pageSizeInt = Integer.parseInt(pageSize);
-            if(pageNumberInt < 0 || pageNumberInt > pageSizeInt || pageSizeInt < 1)
-                throw new IllegalInputException("Bill", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
-        } catch(NumberFormatException e){
-            throw new IllegalInputException("Bill", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
-        }
-        return ResponseEntity.ok().body(billService.getBills(pageNumberInt, pageSizeInt));
+    public ResponseEntity<List<BillDto>> getBills() {
+        return ResponseEntity.ok().body(billService.getBills());
     }
 
     @Operation(
@@ -71,6 +87,7 @@ public class BillController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @PutMapping(produces = "application/json")
     public ResponseEntity<BillDto> putBill(@Validated @RequestBody BillDto bill) {
         return ResponseEntity.ok().body(billService.replaceBill(bill));
@@ -90,6 +107,7 @@ public class BillController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @PatchMapping(produces = "application/json")
     public ResponseEntity<BillDto> patchBill(@Validated @RequestBody BillDto bill) {
         return ResponseEntity.ok().body(billService.modifyBill(bill));
@@ -109,6 +127,7 @@ public class BillController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @DeleteMapping(value = "/{bill_id}", produces = "application/json")
     public ResponseEntity<HashMap<String, String>> deleteBill(@Validated @PathVariable String bill_id) {
         long id;
@@ -135,6 +154,7 @@ public class BillController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     @GetMapping(value = "/{bill_id}", produces = "application/json")
     public ResponseEntity<BillDto> getBill(@Validated @PathVariable String bill_id) {
         long id;

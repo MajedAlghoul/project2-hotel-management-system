@@ -9,10 +9,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Contains endpoints related to the Customer resource.
@@ -30,6 +32,27 @@ public class CustomerController {
     }
 
     @Operation(
+            description = "Endpoint for creating a Customer",
+            summary = "Create Customer",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200"
+
+                    ),
+                    @ApiResponse(
+                            description = "Unauthorized",
+                            responseCode = "403"
+                    ),
+            }
+    )
+    @PostMapping(produces = "application/json")
+    public ResponseEntity<?> registerCustomer (@Validated @RequestBody CustomerDto customerDto){
+
+        return ResponseEntity.ok().body(customerService.postCustomer(customerDto));
+    }
+
+    @Operation(
             description = "Endpoint for fetching a list of Customers",
             summary = "Fetch Customers",
             responses = {
@@ -43,18 +66,10 @@ public class CustomerController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @GetMapping(produces = "application/json")
-    public ResponseEntity<CustomerDto[]> getCustomers(@Validated @RequestParam String pageNumber, @RequestParam String pageSize) {
-        int pageNumberInt, pageSizeInt;
-        try{
-            pageNumberInt = Integer.parseInt(pageNumber);
-            pageSizeInt = Integer.parseInt(pageSize);
-            if(pageNumberInt < 0 || pageNumberInt > pageSizeInt || pageSizeInt < 1)
-                throw new IllegalInputException("Customer", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
-        } catch(NumberFormatException e){
-            throw new IllegalInputException("Customer", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
-        }
-        return ResponseEntity.ok().body(customerService.getCustomers(pageNumberInt, pageSizeInt));
+    public ResponseEntity<List<CustomerDto>> getCustomers() {
+        return ResponseEntity.ok().body(customerService.getCustomers());
     }
 
     @Operation(
@@ -71,6 +86,7 @@ public class CustomerController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     @PutMapping(produces = "application/json")
     public ResponseEntity<CustomerDto> putCustomer(@Validated @RequestBody CustomerDto customer) {
         return ResponseEntity.ok().body(customerService.replaceCustomer(customer));
@@ -90,6 +106,7 @@ public class CustomerController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     @PatchMapping(produces = "application/json")
     public ResponseEntity<CustomerDto> patchCustomer(@Validated @RequestBody CustomerDto customer) {
         return ResponseEntity.ok().body(customerService.modifyCustomer(customer));
@@ -109,6 +126,7 @@ public class CustomerController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     @DeleteMapping(value = "/{customer_id}", produces = "application/json")
     public ResponseEntity<HashMap<String, String>> deleteCustomer(@Validated @PathVariable String customer_id) {
         long id;
@@ -135,6 +153,7 @@ public class CustomerController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     @GetMapping(value = "/{customer_id}", produces = "application/json")
     public ResponseEntity<CustomerDto> getCustomer(@Validated @PathVariable String customer_id) {
         long id;

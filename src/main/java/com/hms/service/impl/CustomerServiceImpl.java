@@ -1,10 +1,13 @@
 package com.hms.service.impl;
 
 import com.hms.dto.CustomerDto;
+import com.hms.dto.CustomerDto;
 import com.hms.exception.DuplicateResourceException;
+import com.hms.exception.NoContentException;
 import com.hms.exception.ResourceNotFoundException;
 import com.hms.model.Customer;
 import com.hms.model.Role;
+import com.hms.model.Customer;
 import com.hms.repository.CustomerRepository;
 import com.hms.repository.RoleRepository;
 import com.hms.service.CustomerService;
@@ -14,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service // Indicates that this class is a service provider (contains business functionalities)
 public class CustomerServiceImpl implements CustomerService {
@@ -32,33 +37,30 @@ public class CustomerServiceImpl implements CustomerService {
         if(customerRepository.existsByEmail(customer.getEmail()))
             throw new DuplicateResourceException("Customer", "customer_id", customer.getEmail());
         Customer newCustomer = mapToEntity(customer);
-        Role role = roleRepository.findByName("ROLE_EMPLOYEE").get();
+        Role role = roleRepository.findByName("ROLE_CUSTOMER").get();
         newCustomer.setRole(Collections.singleton(role));
         return mapToDto(customerRepository.save(newCustomer));
     }
 
     @Override
-    public CustomerDto[] getCustomers(Integer pageNumber, Integer pageSize) {
-        Object[] customersObjects = customerRepository.findAll(PageRequest.of(pageNumber, pageSize)).getContent().toArray();
-        CustomerDto[] customersDtos = new CustomerDto[customersObjects.length];
-        for(int i = 0; i < customersObjects.length; i++)
-            if (customersObjects[i] instanceof Customer)
-                customersDtos[i] = mapToDto((Customer) customersObjects[i]);
-        if(customersDtos.length == 0)
-            throw new ResourceNotFoundException("Customer", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
-        return customersDtos;
+    public List<CustomerDto> getCustomers() {
+        List<Customer> customers = customerRepository.findAll();
+        if (customers.isEmpty()) {
+            throw new NoContentException("No customers registered yet");
+        }
+        return customers.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
     @Override
     public CustomerDto replaceCustomer(CustomerDto customer) {
-        if(!customerRepository.existsByEmail(customer.getEmail()))
+        if(!customerRepository.existsById(customer.getId()))
             throw new ResourceNotFoundException("Customer", "customer_id", String.valueOf(customer.getEmail()));
         return mapToDto(customerRepository.save(mapToEntity(customer)));
     }
 
     @Override
     public CustomerDto modifyCustomer(CustomerDto partialCustomer) {
-        Customer originalCustomer = customerRepository.findByEmail(partialCustomer.getEmail()).orElseThrow(() -> new ResourceNotFoundException("Customer", "email", String.valueOf(partialCustomer.getEmail())));
+        Customer originalCustomer = customerRepository.findById(partialCustomer.getId()).orElseThrow(() -> new ResourceNotFoundException("Customer", "email", String.valueOf(partialCustomer.getId())));
         if(!partialCustomer.getEmail().isEmpty())
             originalCustomer.setEmail(partialCustomer.getEmail());
         if(!partialCustomer.getName().isEmpty())
@@ -85,6 +87,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .email(customer.getEmail())
                 .name(customer.getName())
                 .passwordHash(customer.getPasswordHash())
+                .id(customer.getId())
                 .build();
     }
 

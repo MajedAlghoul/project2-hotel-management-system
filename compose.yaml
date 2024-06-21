@@ -8,3 +8,14 @@ services:
       - 'MYSQL_USER=rootx'
     ports:
       - '3307:3306'
+
+  app:
+    build: .
+    ports:
+      - '8080:8080'
+    depends_on:
+      - mysql
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3307/hms
+      - SPRING_DATASOURCE_USERNAME=rootx
+      - SPRING_DATASOURCE_PASSWORD=1234

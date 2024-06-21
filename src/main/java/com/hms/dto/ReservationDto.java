@@ -1,17 +1,9 @@
 package com.hms.dto;
 
-import com.hms.model.Reservation;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
 
 import java.util.Date;
-import java.util.Set;
 
 @Data // Generates Getters, Setters, toString, hashCode, & equals methods for non-transient fields
 @Builder // Generates a static Builder-Design-Pattern builder method
@@ -19,7 +11,7 @@ public class ReservationDto {
     private Long id;
     private String customerEmail;
     private String checkingStatus;
-    private Long billId;
-    private Date checkin;
-    private Date checkout;
+    private String checkin;
+    private String checkout;
+    private Long room;
 }

@@ -9,10 +9,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Contains endpoints related to the Room resource.
@@ -30,6 +32,28 @@ public class RoomController {
     }
 
     @Operation(
+            description = "Endpoint for creating a Room",
+            summary = "Create Room",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200"
+
+                    ),
+                    @ApiResponse(
+                            description = "Unauthorized",
+                            responseCode = "403"
+                    ),
+            }
+    )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    @PostMapping(produces = "application/json")
+    public ResponseEntity<?> registerRoom (@Validated @RequestBody RoomDto roomDto){
+
+        return ResponseEntity.ok().body(roomService.postRoom(roomDto));
+    }
+
+    @Operation(
             description = "Endpoint for fetching a list of Rooms",
             summary = "Fetch Rooms",
             responses = {
@@ -43,18 +67,10 @@ public class RoomController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @GetMapping(produces = "application/json")
-    public ResponseEntity<RoomDto[]> getRooms(@Validated @RequestParam String pageNumber, @RequestParam String pageSize) {
-        int pageNumberInt, pageSizeInt;
-        try{
-            pageNumberInt = Integer.parseInt(pageNumber);
-            pageSizeInt = Integer.parseInt(pageSize);
-            if(pageNumberInt < 0 || pageNumberInt > pageSizeInt || pageSizeInt < 1)
-                throw new IllegalInputException("Room", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
-        } catch(NumberFormatException e){
-            throw new IllegalInputException("Room", "pageNumber and or pageSize", pageNumber + " and or " + pageSize);
-        }
-        return ResponseEntity.ok().body(roomService.getRooms(pageNumberInt, pageSizeInt));
+    public ResponseEntity<List<RoomDto>> getRooms() {
+        return ResponseEntity.ok().body(roomService.getRooms());
     }
 
     @Operation(
@@ -71,6 +87,7 @@ public class RoomController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @PutMapping(produces = "application/json")
     public ResponseEntity<RoomDto> putRoom(@Validated @RequestBody RoomDto room) {
         return ResponseEntity.ok().body(roomService.replaceRoom(room));
@@ -90,6 +107,7 @@ public class RoomController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @PatchMapping(produces = "application/json")
     public ResponseEntity<RoomDto> patchRoom(@Validated @RequestBody RoomDto room) {
         return ResponseEntity.ok().body(roomService.modifyRoom(room));
@@ -109,6 +127,7 @@ public class RoomController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @DeleteMapping(value = "/{room_id}", produces = "application/json")
     public ResponseEntity<HashMap<String, String>> deleteRoom(@Validated @PathVariable String room_id) {
         long id;
@@ -135,6 +154,7 @@ public class RoomController {
                     )
             }
     )
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     @GetMapping(value = "/{room_id}", produces = "application/json")
     public ResponseEntity<RoomDto> getRoom(@Validated @PathVariable String room_id) {
         long id;
