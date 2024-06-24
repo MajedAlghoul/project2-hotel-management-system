@@ -2,6 +2,8 @@ package com.hms.controller;
 
 import com.hms.dto.ReservationDto;
 import com.hms.exception.IllegalInputException;
+import com.hms.model.Reservation;
+import com.hms.repository.CustomerRepository;
 import com.hms.responsebody.StandardMessageBody;
 import com.hms.service.ReservationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,10 +11,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 
@@ -25,10 +29,12 @@ import java.util.List;
 @Tag(name = "Reservation")
 public class ReservationController {
     private final ReservationService reservationService;
+    private final CustomerRepository customerRepository;
 
     @Autowired
-    public ReservationController(ReservationService reservationService) {
+    public ReservationController(ReservationService reservationService, CustomerRepository customerRepository) {
         this.reservationService = reservationService;
+        this.customerRepository = customerRepository;
     }
 
     @Operation(
@@ -156,13 +162,24 @@ public class ReservationController {
     )
     @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     @GetMapping(value = "/{reservation_id}", produces = "application/json")
-    public ResponseEntity<ReservationDto> getReservation(@Validated @PathVariable String reservation_id) {
+    public ResponseEntity<ReservationDto> getReservation(@Validated @PathVariable String reservation_id, Principal principal) {
         long id;
         try{
             id = Integer.parseInt(reservation_id);
         } catch(NumberFormatException e){
             throw new IllegalInputException("Reservation", "reservation_id", reservation_id);
         }
-        return ResponseEntity.ok().body(reservationService.getReservationById(id));
+        //BillDto b=billService.getBillById(id);
+        ReservationDto r=reservationService.getReservationById(id);
+
+        //logger.info("Principal name: {}", principal.getName());
+        //billService.
+        //CustomerDto cust = customerService.getCustomerById(id);
+
+        // Ensure only the account owner can access their account details
+        if (!r.getCustomerEmail().equals(principal.getName())) {
+            throw new AccessDeniedException("You are not authorized to access this reservation");
+        }
+        return ResponseEntity.ok().body(r);
     }
 }

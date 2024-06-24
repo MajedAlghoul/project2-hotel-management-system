@@ -1,7 +1,9 @@
 package com.hms.controller;
 
+import com.hms.dto.BillDto;
 import com.hms.dto.CustomerDto;
 import com.hms.exception.IllegalInputException;
+import com.hms.model.Reservation;
 import com.hms.responsebody.StandardMessageBody;
 import com.hms.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +15,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 
@@ -88,7 +92,18 @@ public class CustomerController {
     )
     @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     @PutMapping(produces = "application/json")
-    public ResponseEntity<CustomerDto> putCustomer(@Validated @RequestBody CustomerDto customer) {
+    public ResponseEntity<CustomerDto> putCustomer(@Validated @RequestBody CustomerDto customer, Principal principal) throws AccessDeniedException {
+        //BillDto b=billService.getBillById(id);
+        //Reservation r=reservationRepository.findById (b.getReservation()).get();
+
+        //logger.info("Principal name: {}", principal.getName());
+        //billService.
+        //CustomerDto cust = customerService.getCustomerById(id);
+
+        // Ensure only the account owner can access their account details
+        if (!customer.getEmail().equals(principal.getName())) {
+            throw new AccessDeniedException("You are not authorized to access this bill");
+        }
         return ResponseEntity.ok().body(customerService.replaceCustomer(customer));
     }
 
@@ -128,12 +143,23 @@ public class CustomerController {
     )
     @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     @DeleteMapping(value = "/{customer_id}", produces = "application/json")
-    public ResponseEntity<HashMap<String, String>> deleteCustomer(@Validated @PathVariable String customer_id) {
+    public ResponseEntity<HashMap<String, String>> deleteCustomer(@Validated @PathVariable String customer_id,Principal principal) throws AccessDeniedException {
         long id;
         try{
             id = Integer.parseInt(customer_id);
         } catch(NumberFormatException e){
             throw new IllegalInputException("Customer", "customer_id", customer_id);
+        }
+        //BillDto b=billService.getBillById(id);
+        //Reservation r=reservationRepository.findById (b.getReservation()).get();
+
+        //logger.info("Principal name: {}", principal.getName());
+        //billService.
+        //CustomerDto cust = customerService.getCustomerById(id);
+
+        // Ensure only the account owner can access their account details
+        if (!customerService.getCustomerById(id).getEmail().equals(principal.getName())) {
+            throw new AccessDeniedException("You are not authorized to delete this customer");
         }
         customerService.deleteCustomer(id);
         return ResponseEntity.ok().body(new StandardMessageBody("Deleted successfully.").getContent());
@@ -155,12 +181,23 @@ public class CustomerController {
     )
     @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     @GetMapping(value = "/{customer_id}", produces = "application/json")
-    public ResponseEntity<CustomerDto> getCustomer(@Validated @PathVariable String customer_id) {
+    public ResponseEntity<CustomerDto> getCustomer(@Validated @PathVariable String customer_id,Principal principal) throws AccessDeniedException {
         long id;
         try{
             id = Integer.parseInt(customer_id);
         } catch(NumberFormatException e){
             throw new IllegalInputException("Customer", "customer_id", customer_id);
+        }
+        //BillDto b=billService.getBillById(id);
+        //Reservation r=reservationRepository.findById (b.getReservation()).get();
+
+        //logger.info("Principal name: {}", principal.getName());
+        //billService.
+        //CustomerDto cust = customerService.getCustomerById(id);
+
+        // Ensure only the account owner can access their account details
+        if (!customerService.getCustomerById(id).getEmail().equals(principal.getName())) {
+            throw new AccessDeniedException("You are not authorized to access this customer");
         }
         return ResponseEntity.ok().body(customerService.getCustomerById(id));
     }

@@ -1,9 +1,15 @@
 package com.hms.controller;
 
 import com.hms.dto.BillDto;
+import com.hms.dto.CustomerDto;
 import com.hms.exception.IllegalInputException;
+import com.hms.model.Bill;
+import com.hms.model.Reservation;
+import com.hms.model.User;
+import com.hms.repository.ReservationRepository;
 import com.hms.responsebody.StandardMessageBody;
 import com.hms.service.BillService;
+import com.hms.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +19,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 
@@ -25,10 +33,14 @@ import java.util.List;
 @Tag(name = "Bill")
 public class BillController {
     private final BillService billService;
+    private final CustomerService customerService;
+    private final ReservationRepository reservationRepository;
 
     @Autowired
-    public BillController(BillService billService) {
+    public BillController(BillService billService, CustomerService customerService, ReservationRepository reservationRepository) {
         this.billService = billService;
+        this.customerService = customerService;
+        this.reservationRepository = reservationRepository;
     }
 
     @Operation(
@@ -156,13 +168,24 @@ public class BillController {
     )
     @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     @GetMapping(value = "/{bill_id}", produces = "application/json")
-    public ResponseEntity<BillDto> getBill(@Validated @PathVariable String bill_id) {
+    public ResponseEntity<BillDto> getBill(@Validated @PathVariable String bill_id, Principal principal) throws AccessDeniedException {
         long id;
         try{
             id = Integer.parseInt(bill_id);
         } catch(NumberFormatException e){
             throw new IllegalInputException("Bill", "bill_id", bill_id);
         }
-        return ResponseEntity.ok().body(billService.getBillById(id));
+        BillDto b=billService.getBillById(id);
+        Reservation r=reservationRepository.findById (b.getReservation()).get();
+
+        //logger.info("Principal name: {}", principal.getName());
+        //billService.
+        //CustomerDto cust = customerService.getCustomerById(id);
+
+        // Ensure only the account owner can access their account details
+        if (!r.getCustomer().getEmail().equals(principal.getName())) {
+            throw new AccessDeniedException("You are not authorized to access this bill");
+        }
+        return ResponseEntity.ok().body(b);
     }
 }

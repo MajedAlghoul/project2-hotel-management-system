@@ -1,20 +1,17 @@
-# Use a base image with JDK installed
-FROM openjdk:17-jdk-slim
+# Use a base image that contains Java
+FROM openjdk:17-jdk-alpine
 
-# Set the working directory inside the container
-WORKDIR /app
+# Add a volume pointing to /tmp
+VOLUME /tmp
 
-# Copy the build files
-COPY . .
-RUN chmod +x gradlew
-# Build the application, skipping tests
-RUN ./gradlew clean build -x test
-
-# Copy the JAR file to the container
-COPY build/libs/hms-0.0.1-SNAPSHOT.jar app.jar
-
-# Expose the port your application runs on
+# Make port 8080 available to the world outside this container
 EXPOSE 8080
 
-# Set the entry point to run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# The application's jar file
+ARG JAR_FILE=build/libs/hms-0.0.1-SNAPSHOT.jar
+
+# Add the application's jar to the container
+ADD ${JAR_FILE} app.jar
+
+# Run the jar file
+ENTRYPOINT ["java", "-jar", "/app.jar"]

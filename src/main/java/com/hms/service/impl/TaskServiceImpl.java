@@ -11,7 +11,9 @@ import com.hms.repository.TaskRepository;
 import com.hms.repository.RoleRepository;
 import com.hms.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,12 +42,17 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<TaskDto> getTasks() {
+    public Page<TaskDto> getTasks(int page,int size) {
         List<Task> tasks = taskRepository.findAll();
         if (tasks.isEmpty()) {
             throw new NoContentException("No tasks registered yet");
         }
-        return tasks.stream().map(this::mapToDto).collect(Collectors.toList());
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Task> taskPage = taskRepository.findAll(pageable);
+
+        return taskPage.map(this::mapToDto);
+
+        //return tasks.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
     @Override
